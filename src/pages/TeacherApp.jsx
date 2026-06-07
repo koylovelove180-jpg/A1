@@ -15,6 +15,8 @@ import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebas
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { TEACHER_EMAIL, TEACHER_USERNAME, isFirebaseConfigured } from '../config';
+import AnnouncementContent from '../components/AnnouncementContent';
+import AnnouncementQrTool from '../components/AnnouncementQrTool';
 import { PRETEST_MUSIC_OPTIONS, resolvePretestMusicUrl } from '../data/pretestMusicOptions';
 import { auth } from '../firebase';
 import { useLessonControls } from '../hooks/useLessonControls';
@@ -372,13 +374,51 @@ function TeacherDashboard({ user, onLogout }) {
               </label>
               <label className="block">
                 <span className="text-sm font-semibold text-slate-700">ประกาศถึงนักศึกษา</span>
+                <ToggleRow
+                  label="ใช้ HTML ในประกาศ"
+                  description="รองรับ HTML เช่น ลิงก์ รูปภาพ และ QR Code สำหรับให้นักเรียนสแกน"
+                  enabled={draft.announcementHtmlEnabled}
+                  onToggle={() => toggleField('announcementHtmlEnabled')}
+                />
                 <textarea
-                  rows={4}
+                  rows={draft.announcementHtmlEnabled ? 8 : 4}
                   value={draft.announcement}
                   onChange={(event) => setDraft((current) => ({ ...current, announcement: event.target.value }))}
-                  className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none ring-orange-200 focus:ring-2"
-                  placeholder="เช่น วันนี้ให้ทำ Pre-Test ก่อน 09:30 น."
+                  className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 font-mono text-sm outline-none ring-orange-200 focus:ring-2"
+                  placeholder={
+                    draft.announcementHtmlEnabled
+                      ? 'เช่น <p>สแกน QR เพื่อเข้าร่วม</p><img src="https://..." alt="QR Code" width="200" />'
+                      : 'เช่น วันนี้ให้ทำ Pre-Test ก่อน 09:30 น.'
+                  }
                 />
+                {draft.announcementHtmlEnabled && draft.announcement ? (
+                  <div className="mt-4 rounded-2xl border border-orange-100 bg-orange-50 p-4">
+                    <p className="text-sm font-bold uppercase tracking-[0.18em] text-orange-600">ตัวอย่างที่นักเรียนจะเห็น</p>
+                    <AnnouncementContent
+                      content={draft.announcement}
+                      htmlEnabled={draft.announcementHtmlEnabled}
+                    />
+                  </div>
+                ) : null}
+                {draft.announcementHtmlEnabled ? (
+                  <div className="mt-4">
+                    <AnnouncementQrTool
+                      htmlEnabled={draft.announcementHtmlEnabled}
+                      onEnableHtml={() =>
+                        setDraft((current) => ({ ...current, announcementHtmlEnabled: true }))
+                      }
+                      onInsert={(snippet) =>
+                        setDraft((current) => ({
+                          ...current,
+                          announcementHtmlEnabled: true,
+                          announcement: current.announcement
+                            ? `${current.announcement.trim()}\n\n${snippet}`
+                            : snippet,
+                        }))
+                      }
+                    />
+                  </div>
+                ) : null}
               </label>
             </div>
           </div>

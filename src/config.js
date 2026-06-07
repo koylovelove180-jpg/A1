@@ -11,6 +11,7 @@ export const DEFAULT_LESSON_CONTROLS = {
   courseTitle: 'การประกอบอาหารเบื้องต้น',
   classroomName: 'ห้องเรียนทั่วไป',
   announcement: '',
+  announcementHtmlEnabled: false,
   pretestMusicEnabled: false,
   pretestMusicFile: '/audio/เรียน.mp3',
   pretestMusicTitle: '',

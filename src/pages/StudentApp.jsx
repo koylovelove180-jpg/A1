@@ -24,9 +24,11 @@ import {
 } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import PreTestQuizFlow from '../components/PreTestQuizFlow';
+import AnnouncementContent from '../components/AnnouncementContent';
 import { lessonData } from '../data/lessonData';
 import { useLessonControls } from '../hooks/useLessonControls';
 import { isPageLocked } from '../utils/lessonAccess';
+import { isAnnouncementEmpty } from '../utils/announcementHtml';
 import { clearPretestMusicCompleted } from '../utils/pretestMusicStorage';
 
 const _removedLessonData = [
@@ -894,10 +896,13 @@ function HomePage({ onStartPreTest, settings }) {
         </div>
       </div>
 
-      {settings.announcement ? (
+      {!isAnnouncementEmpty(settings.announcement) ? (
         <div className="rounded-3xl border border-orange-200 bg-orange-50 p-6 text-orange-950 shadow-sm">
           <p className="text-sm font-bold uppercase tracking-[0.18em] text-orange-600">ประกาศจากอาจารย์</p>
-          <p className="mt-3 whitespace-pre-line text-lg leading-8">{settings.announcement}</p>
+          <AnnouncementContent
+            content={settings.announcement}
+            htmlEnabled={settings.announcementHtmlEnabled === true}
+          />
         </div>
       ) : null}
 

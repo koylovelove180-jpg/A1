@@ -59,3 +59,35 @@ body::-webkit-scrollbar-thumb,
   background: #fed7aa;
   color: #7c2d12;
 }
+
+.announcement-html img {
+  display: block;
+  width: 100%;
+  max-width: 240px;
+  height: auto;
+  margin: 1rem auto;
+}
+
+.announcement-html a {
+  color: #c2410c;
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+.announcement-html h3,
+.announcement-html h4 {
+  margin-top: 0.75rem;
+  margin-bottom: 0.5rem;
+  font-weight: 800;
+  color: #7c2d12;
+}
+
+.announcement-html ul,
+.announcement-html ol {
+  margin: 0.75rem 0;
+  padding-left: 1.25rem;
+}
+
+.announcement-html p {
+  margin: 0.5rem 0;
+}
