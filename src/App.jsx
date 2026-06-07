@@ -3,16 +3,22 @@ import {
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
+  ClipboardCheck,
   Flame,
+  HelpCircle,
   HeartPulse,
+  Lock,
   Maximize2,
   Menu,
   Minimize2,
+  PlayCircle,
   RotateCcw,
   ShieldCheck,
   Sparkles,
   Timer,
   Trophy,
+  Unlock,
+  UserCog,
   X,
   XCircle,
 } from 'lucide-react';
@@ -21,6 +27,111 @@ import { useCallback, useEffect, useState } from 'react';
 const lessonData = [
   {
     id: 1,
+    type: 'home',
+    title: 'ระบบบทเรียนออนไลน์ การประกอบอาหารเบื้องต้น',
+    subtitle: 'เริ่มจากแบบทดสอบก่อนเรียน จากนั้นรออาจารย์เปิดบทเรียนเพื่อเรียนเนื้อหาและทำแบบทดสอบหลังเรียน'
+  },
+  {
+    id: 2,
+    type: 'quiz-interactive',
+    quizMode: 'pre',
+    title: 'แบบทดสอบก่อนเรียน (Pre-Test)',
+    subtitle: 'วัดระดับความรู้พื้นฐานก่อนเข้าสู่บทเรียน จำนวน 10 ข้อ',
+    questions: [
+      {
+        q: "ก่อนเริ่มเรียน ข้อใดใกล้เคียงกับความหมายของ 'การประกอบอาหาร' มากที่สุด?",
+        options: [
+          'การจัดจานอาหารให้มีสีสันสวยงาม',
+          'การนำวัตถุดิบมาผ่านกระบวนการเตรียมและปรุงให้เหมาะสมต่อการบริโภค',
+          'การเก็บอาหารไว้ให้นานที่สุดโดยไม่ต้องใช้ความร้อน',
+          'การเลือกซื้อวัตถุดิบจากตลาดเท่านั้น'
+        ],
+        answer: 1
+      },
+      {
+        q: 'ข้อใดเป็นเหตุผลสำคัญที่ต้องทำอาหารให้สุกด้วยความร้อน?',
+        options: [
+          'เพื่อเพิ่มน้ำหนักของอาหาร',
+          'เพื่อทำลายเชื้อโรคและทำให้อาหารปลอดภัยขึ้น',
+          'เพื่อทำให้อาหารทุกชนิดมีรสหวาน',
+          'เพื่อเปลี่ยนอาหารทุกชนิดให้เก็บได้นานตลอดไป'
+        ],
+        answer: 1
+      },
+      {
+        q: 'ครัวร้อนมักรับผิดชอบงานประเภทใด?',
+        options: [
+          'สลัดและอาหารเย็นเท่านั้น',
+          'ขนมอบและไอศกรีมเท่านั้น',
+          'อาหารที่ต้องปรุงและเสิร์ฟร้อน เช่น อบ ทอด ปิ้ง ย่าง',
+          'การจัดดอกไม้และตกแต่งโต๊ะอาหาร'
+        ],
+        answer: 2
+      },
+      {
+        q: 'ครัวเย็นควรให้ความสำคัญกับเรื่องใดเป็นพิเศษ?',
+        options: [
+          'การควบคุมอุณหภูมิและสุขอนามัย',
+          'การใช้ไฟแรงตลอดเวลา',
+          'การอบด้วยเตาอุณหภูมิสูง',
+          'การทอดอาหารในน้ำมันมาก'
+        ],
+        answer: 0
+      },
+      {
+        q: 'ลักษณะเด่นของงานเบเกอรี่คือข้อใด?',
+        options: [
+          'ไม่ต้องชั่งตวงวัตถุดิบ',
+          'ใช้การกะปริมาณด้วยสายตาเป็นหลัก',
+          'ต้องใช้ความแม่นยำในการชั่งตวงและควบคุมขั้นตอน',
+          'ต้องเสิร์ฟแบบเย็นเท่านั้น'
+        ],
+        answer: 2
+      },
+      {
+        q: 'ข้อใดเป็นวิธีประกอบอาหารด้วยความร้อนแห้ง?',
+        options: ['นึ่ง', 'ตุ๋น', 'ปิ้ง', 'ลวก'],
+        answer: 2
+      },
+      {
+        q: 'ข้อใดเป็นวิธีประกอบอาหารด้วยความร้อนชื้น?',
+        options: ['อบ', 'ย่าง', 'นึ่ง', 'ทอด'],
+        answer: 2
+      },
+      {
+        q: 'การลวกผักที่ดีควรทำอย่างไรหลังนำผักขึ้นจากน้ำเดือด?',
+        options: [
+          'พักไว้กลางแดด',
+          'แช่น้ำเย็นทันทีเพื่อหยุดความร้อน',
+          'นำไปทอดต่อทันที',
+          'ปิดฝาทิ้งไว้ในหม้อ'
+        ],
+        answer: 1
+      },
+      {
+        q: 'ข้อใดเป็นข้อควรระวังของการทอดอาหาร?',
+        options: [
+          'อาหารอาจอมน้ำมันมากเกินไป',
+          'อาหารจะไม่มีวันสุก',
+          'อาหารจะเสียคุณค่าทางอาหารทั้งหมดทันที',
+          'อาหารจะไม่มีสีและกลิ่น'
+        ],
+        answer: 0
+      },
+      {
+        q: 'การนึ่งช่วยสงวนคุณค่าทางอาหารได้ดีเพราะเหตุใด?',
+        options: [
+          'อาหารสัมผัสน้ำโดยตรงตลอดเวลา',
+          'สารอาหารไม่ละลายทิ้งไปกับน้ำต้มโดยตรง',
+          'ต้องใช้น้ำมันจำนวนมาก',
+          'ใช้ไฟแรงจนอาหารไหม้'
+        ],
+        answer: 1
+      }
+    ]
+  },
+  {
+    id: 3,
     type: 'cover',
     title: 'ความรู้เบื้องต้นเกี่ยวกับการประกอบอาหาร',
     subtitle: 'เอกสารประกอบการเรียนเชิงวิชาการ / E-Learning Module (หลักสูตร 4 ชั่วโมง)',
@@ -30,7 +141,7 @@ const lessonData = [
     image: '[https://images.unsplash.com/photo-1600565193348-f74bd3c7ccdf?auto=format&fit=crop&w=1600&q=80&fm=webp](https://images.unsplash.com/photo-1600565193348-f74bd3c7ccdf?auto=format&fit=crop&w=1600&q=80&fm=webp)'
   },
   {
-    id: 2,
+    id: 4,
     type: 'article',
     title: 'ความหมายของการประกอบอาหาร',
     image: '[https://images.unsplash.com/photo-1495521821757-a1efb6729352?auto=format&fit=crop&w=800&q=80&fm=webp](https://images.unsplash.com/photo-1495521821757-a1efb6729352?auto=format&fit=crop&w=800&q=80&fm=webp)',
@@ -50,7 +161,7 @@ const lessonData = [
     ]
   },
   {
-    id: 3,
+    id: 5,
     type: 'cards-grid',
     title: 'ประโยชน์ 5 ประการของการประกอบอาหาร',
     subtitle: 'เจาะลึกเหตุผลสำคัญทางวิทยาศาสตร์และโภชนาการที่เราต้องนำอาหารมาปรุงสุก',
@@ -83,7 +194,7 @@ const lessonData = [
     ]
   },
   {
-    id: 4,
+    id: 6,
     type: 'split-advanced',
     title: 'ครัวร้อน (Hot Kitchen)',
     highlight: 'ศูนย์กลางการปรุงสุกและการควบคุมอุณหภูมิความร้อน',
@@ -98,7 +209,7 @@ const lessonData = [
     image: '[https://images.unsplash.com/photo-1574484284002-952d92456975?auto=format&fit=crop&w=800&q=80&fm=webp](https://images.unsplash.com/photo-1574484284002-952d92456975?auto=format&fit=crop&w=800&q=80&fm=webp)'
   },
   {
-    id: 5,
+    id: 7,
     type: 'split-advanced',
     title: 'ครัวเย็น (Cold Kitchen / Garde Manger)',
     highlight: 'ศิลปะแห่งความสดใหม่ การจัดแต่ง และการควบคุมอุณหภูมิ',
@@ -113,7 +224,7 @@ const lessonData = [
     image: '[https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=800&q=80&fm=webp](https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=800&q=80&fm=webp)'
   },
   {
-    id: 6,
+    id: 8,
     type: 'split-advanced',
     title: 'ครัวเบเกอรี่ (Bakery & Pastry Kitchen)',
     highlight: 'ความแม่นยำ วิทยาศาสตร์ และศิลปะในการอบขนม',
@@ -127,7 +238,7 @@ const lessonData = [
     image: '[https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=800&q=80&fm=webp](https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=800&q=80&fm=webp)'
   },
   {
-    id: 7,
+    id: 9,
     type: 'methods',
     title: 'เทคนิคการประกอบอาหารด้วยความร้อนแห้ง',
     subtitle: 'การปิ้ง ย่าง เผา อบ (Dry Heat Cooking Methods)',
@@ -157,7 +268,7 @@ const lessonData = [
     cons: 'ข้อเสีย: หากใช้เวลาในการทำนานเกินไป จะทำให้อาหารสูญเสียน้ำ แห้งกระด้างเกินไป ดูไม่น่ารับประทานและเสียรสชาติ'
   },
   {
-    id: 8,
+    id: 10,
     type: 'methods',
     title: 'เทคนิคการประกอบอาหารด้วยของเหลว / ความร้อนชื้น',
     subtitle: 'การต้ม ลวก นึ่ง ตุ๋น (Moist Heat Cooking Methods)',
@@ -185,7 +296,7 @@ const lessonData = [
     ]
   },
   {
-    id: 9,
+    id: 11,
     type: 'methods',
     title: 'เทคนิคการประกอบอาหารด้วยน้ำมัน',
     subtitle: 'การผัด ทอด เจียว คั่ว รวน (Fat-Based Cooking)',
@@ -213,8 +324,9 @@ const lessonData = [
     ]
   },
   {
-    id: 10,
+    id: 12,
     type: 'quiz-interactive',
+    quizMode: 'post',
     title: 'แบบทดสอบประเมินความรู้ (Post-Test)',
     subtitle: 'ทดสอบความเข้าใจหลังการเรียนการสอน จำนวน 10 ข้อ',
     questions: [
@@ -300,30 +412,69 @@ function imageUrl(value) {
   return match?.[1] ?? value;
 }
 
+function isAlwaysOpenPage(page) {
+  return page.type === 'home' || page.quizMode === 'pre';
+}
+
+function isPageLocked(page, contentUnlocked) {
+  return !contentUnlocked && !isAlwaysOpenPage(page);
+}
+
 function App() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [touchStartX, setTouchStartX] = useState(null);
+  const [contentUnlocked, setContentUnlocked] = useState(() => localStorage.getItem('contentUnlocked') === 'true');
+  const [lockNotice, setLockNotice] = useState('');
   const currentPage = lessonData[activeIndex];
   const progress = ((activeIndex + 1) / lessonData.length) * 100;
   const isQuizPage = currentPage.type === 'quiz-interactive';
+  const preTestIndex = lessonData.findIndex((page) => page.quizMode === 'pre');
 
   const goToPage = useCallback((index) => {
-    setActiveIndex(Math.min(Math.max(index, 0), lessonData.length - 1));
+    const nextIndex = Math.min(Math.max(index, 0), lessonData.length - 1);
+    const nextPage = lessonData[nextIndex];
+
+    if (isPageLocked(nextPage, contentUnlocked)) {
+      setLockNotice('บทเรียนส่วนนี้ยังล็อกอยู่ กรุณาทำ Pre-Test และรออาจารย์เปิดบทเรียน');
+      setIsSidebarOpen(false);
+      return;
+    }
+
+    setLockNotice('');
+    setActiveIndex(nextIndex);
     setIsSidebarOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, []);
+  }, [contentUnlocked]);
 
   const goNext = useCallback(() => {
-    setActiveIndex((index) => Math.min(index + 1, lessonData.length - 1));
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, []);
+    setActiveIndex((index) => {
+      const nextIndex = Math.min(index + 1, lessonData.length - 1);
+      const nextPage = lessonData[nextIndex];
+
+      if (isPageLocked(nextPage, contentUnlocked)) {
+        setLockNotice('รออาจารย์ผู้สอนเปิดบทเรียนก่อน จึงจะไปหน้าถัดไปได้');
+        return index;
+      }
+
+      setLockNotice('');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return nextIndex;
+    });
+  }, [contentUnlocked]);
 
   const goPrevious = useCallback(() => {
     setActiveIndex((index) => Math.max(index - 1, 0));
+    setLockNotice('');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
+
+  const toggleContentUnlocked = (nextValue) => {
+    setContentUnlocked(nextValue);
+    localStorage.setItem('contentUnlocked', String(nextValue));
+    setLockNotice(nextValue ? 'อาจารย์เปิดบทเรียนแล้ว นักศึกษาสามารถเรียนต่อได้' : 'อาจารย์ปิดบทเรียนแล้ว นักศึกษาจะเห็นเฉพาะ Home และ Pre-Test');
+  };
 
   const toggleFullscreen = async () => {
     if (!document.fullscreenElement) {
@@ -339,6 +490,12 @@ function App() {
     document.addEventListener('fullscreenchange', onFullscreenChange);
     return () => document.removeEventListener('fullscreenchange', onFullscreenChange);
   }, []);
+
+  useEffect(() => {
+    if (isPageLocked(currentPage, contentUnlocked)) {
+      setActiveIndex(0);
+    }
+  }, [contentUnlocked, currentPage]);
 
   useEffect(() => {
     const onKeyDown = (event) => {
@@ -397,6 +554,7 @@ function App() {
 
       <Sidebar
         activeIndex={activeIndex}
+        contentUnlocked={contentUnlocked}
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
         onSelect={goToPage}
@@ -415,12 +573,25 @@ function App() {
             </button>
           </div>
 
-          <ContentRenderer page={currentPage} />
+          {lockNotice && (
+            <div className="mb-6 rounded-3xl border border-orange-200 bg-orange-50 p-4 text-sm font-semibold text-orange-800 shadow-sm">
+              {lockNotice}
+            </div>
+          )}
+
+          <ContentRenderer
+            contentUnlocked={contentUnlocked}
+            onSelectPage={goToPage}
+            onToggleContentUnlocked={toggleContentUnlocked}
+            page={currentPage}
+            preTestIndex={preTestIndex}
+          />
         </div>
       </main>
 
       <BottomNavigation
         activeIndex={activeIndex}
+        contentUnlocked={contentUnlocked}
         total={lessonData.length}
         onNext={goNext}
         onPrevious={goPrevious}
@@ -456,7 +627,7 @@ function MobileHeader({ isFullscreen, onMenuClick, onFullscreenClick }) {
   );
 }
 
-function Sidebar({ activeIndex, isOpen, onClose, onSelect }) {
+function Sidebar({ activeIndex, contentUnlocked, isOpen, onClose, onSelect }) {
   return (
     <>
       <aside
@@ -488,6 +659,7 @@ function Sidebar({ activeIndex, isOpen, onClose, onSelect }) {
           <nav className="custom-scrollbar flex-1 space-y-2 overflow-y-auto p-4">
             {lessonData.map((item, index) => {
               const isActive = index === activeIndex;
+              const locked = isPageLocked(item, contentUnlocked);
               return (
                 <button
                   key={item.id}
@@ -496,7 +668,9 @@ function Sidebar({ activeIndex, isOpen, onClose, onSelect }) {
                   className={`group flex w-full gap-3 rounded-2xl p-3 text-left transition ${
                     isActive
                       ? 'bg-orange-500 text-white shadow-glow'
-                      : 'bg-slate-50 text-slate-700 hover:bg-orange-50 hover:text-orange-700'
+                      : locked
+                        ? 'bg-slate-100 text-slate-400 hover:bg-slate-100'
+                        : 'bg-slate-50 text-slate-700 hover:bg-orange-50 hover:text-orange-700'
                   }`}
                 >
                   <span
@@ -508,8 +682,9 @@ function Sidebar({ activeIndex, isOpen, onClose, onSelect }) {
                   </span>
                   <span>
                     <span className="block text-sm font-semibold leading-snug">{item.title}</span>
-                    <span className={`mt-1 block text-xs ${isActive ? 'text-orange-50' : 'text-slate-400'}`}>
-                      {item.type}
+                    <span className={`mt-1 flex items-center gap-1 text-xs ${isActive ? 'text-orange-50' : 'text-slate-400'}`}>
+                      {locked ? <Lock size={12} /> : null}
+                      {locked ? 'ล็อกไว้รออาจารย์เปิด' : item.type}
                     </span>
                   </span>
                 </button>
@@ -531,9 +706,11 @@ function Sidebar({ activeIndex, isOpen, onClose, onSelect }) {
   );
 }
 
-function BottomNavigation({ activeIndex, total, onNext, onPrevious }) {
+function BottomNavigation({ activeIndex, contentUnlocked, total, onNext, onPrevious }) {
   const isFirst = activeIndex === 0;
   const isLast = activeIndex === total - 1;
+  const nextPage = lessonData[Math.min(activeIndex + 1, total - 1)];
+  const isNextLocked = !isLast && isPageLocked(nextPage, contentUnlocked);
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-40 border-t border-white/80 bg-white/90 px-4 py-3 shadow-[0_-16px_40px_-28px_rgba(15,23,42,0.5)] backdrop-blur-xl lg:left-80">
@@ -558,19 +735,40 @@ function BottomNavigation({ activeIndex, total, onNext, onPrevious }) {
         <button
           type="button"
           onClick={onNext}
-          disabled={isLast}
+          disabled={isLast || isNextLocked}
           className="inline-flex items-center gap-2 rounded-2xl bg-orange-500 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-orange-500/25 transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-40 sm:px-5"
         >
-          <span className="hidden sm:inline">Next</span>
-          <ChevronRight size={20} />
+          {isNextLocked ? (
+            <>
+              <Lock size={18} />
+              <span className="hidden sm:inline">รออาจารย์เปิด</span>
+            </>
+          ) : (
+            <>
+              <span className="hidden sm:inline">Next</span>
+              <ChevronRight size={20} />
+            </>
+          )}
         </button>
       </div>
     </div>
   );
 }
 
-function ContentRenderer({ page }) {
+function ContentRenderer({ contentUnlocked, onSelectPage, onToggleContentUnlocked, page, preTestIndex }) {
+  if (isPageLocked(page, contentUnlocked)) {
+    return <LockedContentGate onGoHome={() => onSelectPage(0)} />;
+  }
+
   switch (page.type) {
+    case 'home':
+      return (
+        <HomePage
+          contentUnlocked={contentUnlocked}
+          onStartPreTest={() => onSelectPage(preTestIndex)}
+          onToggleContentUnlocked={onToggleContentUnlocked}
+        />
+      );
     case 'cover':
       return <CoverPage page={page} />;
     case 'article':
@@ -586,6 +784,219 @@ function ContentRenderer({ page }) {
     default:
       return null;
   }
+}
+
+function HomePage({ contentUnlocked, onStartPreTest, onToggleContentUnlocked }) {
+  const studentSteps = [
+    {
+      icon: BookOpen,
+      title: 'อ่านคำแนะนำสั้น ๆ',
+      desc: 'หน้านี้บอกภาพรวมว่าต้องเริ่มอย่างไร ไม่ต้องตั้งค่าอะไรเพิ่มเติม'
+    },
+    {
+      icon: ClipboardCheck,
+      title: 'ทำแบบทดสอบก่อนเรียน',
+      desc: 'ตอบคำถาม 10 ข้อตามความรู้เดิม ไม่ต้องกังวลหากยังตอบไม่ได้'
+    },
+    {
+      icon: Unlock,
+      title: 'รออาจารย์เปิดบทเรียน',
+      desc: 'เมื่ออาจารย์เปิดแล้ว จึงเรียนเนื้อหาและทำแบบทดสอบหลังเรียนได้'
+    }
+  ];
+
+  const teacherSteps = [
+    'เปิดเว็บบนจอโปรเจกเตอร์ หรือส่งลิงก์ให้นักศึกษา',
+    'ให้นักศึกษากดปุ่มเริ่มทำ Pre-Test และตอบให้ครบ 10 ข้อ',
+    'รอให้นักศึกษาทำแบบทดสอบก่อนเรียนเสร็จ',
+    'ตรวจสถานะบทเรียนในกล่องโหมดอาจารย์',
+    'กดเปิดบทเรียน เมื่อต้องการให้นักศึกษาเห็นเนื้อหา',
+    'ให้นักศึกษาเรียนตามลำดับ และทำ Post-Test หลังเรียน'
+  ];
+
+  const faqItems = [
+    {
+      q: 'ถ้านักศึกษาบอกว่าบทเรียนยังล็อกอยู่ต้องทำอย่างไร?',
+      a: 'ให้อาจารย์ตรวจกล่องโหมดอาจารย์ แล้วกดเปิดบทเรียนอีกครั้ง'
+    },
+    {
+      q: 'ถ้านักศึกษาใช้มือถือหรือแท็บเล็ตได้ไหม?',
+      a: 'ใช้งานได้ หน้าจอจะปรับเป็นการ์ดเรียงแนวตั้งและปุ่มขนาดใหญ่'
+    },
+    {
+      q: 'ต้องให้นักศึกษาทำ Pre-Test ก่อนเสมอไหม?',
+      a: 'แนะนำให้ทำก่อน เพื่อวัดระดับความรู้เดิมและช่วยให้อาจารย์ปรับการสอนได้'
+    },
+    {
+      q: 'ต้องการปิดบทเรียนอีกครั้งทำได้ไหม?',
+      a: 'ทำได้โดยกดปุ่มปิดบทเรียนในโหมดอาจารย์'
+    }
+  ];
+
+  return (
+    <section className="space-y-8">
+      <div className="overflow-hidden rounded-[2rem] bg-gradient-to-br from-slate-950 via-slate-900 to-orange-950 p-6 text-white shadow-2xl sm:p-10 lg:p-12">
+        <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
+          <div>
+            <PageEyebrow label="Home Guide" light />
+            <h2 className="mt-5 text-3xl font-extrabold leading-tight sm:text-5xl lg:text-6xl">
+              ระบบบทเรียนออนไลน์ การประกอบอาหารเบื้องต้น
+            </h2>
+            <p className="mt-5 max-w-3xl text-lg leading-9 text-orange-50">
+              เริ่มจากแบบทดสอบก่อนเรียน จากนั้นรออาจารย์เปิดบทเรียน เพื่อให้ทุกคนเรียนไปพร้อมกันอย่างเป็นลำดับ
+            </p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <button
+                type="button"
+                onClick={onStartPreTest}
+                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-orange-500 px-6 py-4 font-bold text-white shadow-lg shadow-orange-950/30 transition hover:bg-orange-600"
+              >
+                <PlayCircle size={22} />
+                เริ่มทำ Pre-Test
+              </button>
+              <a
+                href="#teacher-guide"
+                className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white/10 px-6 py-4 font-bold text-white backdrop-blur transition hover:bg-white/15"
+              >
+                <UserCog size={22} />
+                ดูคู่มืออาจารย์
+              </a>
+            </div>
+          </div>
+
+          <div className="rounded-3xl border border-white/15 bg-white/10 p-6 backdrop-blur-xl">
+            <div className={`mb-5 inline-flex rounded-2xl p-4 ${contentUnlocked ? 'bg-emerald-400/20 text-emerald-200' : 'bg-white/10 text-orange-200'}`}>
+              {contentUnlocked ? <Unlock size={34} /> : <Lock size={34} />}
+            </div>
+            <h3 className="text-2xl font-extrabold">{contentUnlocked ? 'บทเรียนเปิดแล้ว' : 'บทเรียนยังล็อกอยู่'}</h3>
+            <p className="mt-3 leading-8 text-slate-200">
+              {contentUnlocked
+                ? 'นักศึกษาสามารถเข้าเรียนเนื้อหาและทำ Post-Test ได้แล้ว'
+                : 'นักศึกษาจะเห็น Home และ Pre-Test ก่อน จนกว่าอาจารย์จะเปิดบทเรียน'}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid gap-5 md:grid-cols-3">
+        {studentSteps.map((step, index) => {
+          const Icon = step.icon;
+          return (
+            <article key={step.title} className="rounded-3xl bg-white p-6 shadow-xl shadow-slate-200/70">
+              <div className="mb-5 flex items-center gap-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-100 text-orange-600">
+                  <Icon size={24} />
+                </div>
+                <span className="rounded-full bg-slate-100 px-3 py-1 text-sm font-bold text-slate-500">Step {index + 1}</span>
+              </div>
+              <h3 className="text-xl font-extrabold text-slate-950">{step.title}</h3>
+              <p className="mt-3 leading-8 text-slate-600">{step.desc}</p>
+            </article>
+          );
+        })}
+      </div>
+
+      <div className="rounded-3xl border border-orange-100 bg-orange-50 p-5 text-orange-900">
+        <p className="font-bold">หมายเหตุสำหรับนักศึกษา</p>
+        <p className="mt-2 leading-8">
+          ระบบนี้ใช้เพื่อวัดความเข้าใจก่อนและหลังเรียน คะแนนใช้ประกอบการเรียนการสอน โปรดตอบ Pre-Test ตามความรู้เดิมของตนเอง
+        </p>
+      </div>
+
+      <section id="teacher-guide" className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+        <TeacherGuidePanel
+          contentUnlocked={contentUnlocked}
+          onToggleContentUnlocked={onToggleContentUnlocked}
+          steps={teacherSteps}
+        />
+        <div className="rounded-[2rem] bg-white p-6 shadow-xl shadow-slate-200/70 sm:p-8">
+          <div className="mb-6 flex items-center gap-3">
+            <div className="rounded-2xl bg-slate-100 p-3 text-slate-700">
+              <HelpCircle size={26} />
+            </div>
+            <div>
+              <p className="text-sm font-bold uppercase tracking-[0.18em] text-orange-500">FAQ</p>
+              <h3 className="text-2xl font-extrabold text-slate-950">คำถามที่พบบ่อย</h3>
+            </div>
+          </div>
+          <div className="space-y-3">
+            {faqItems.map((item) => (
+              <article key={item.q} className="rounded-2xl bg-slate-50 p-4">
+                <h4 className="font-bold text-slate-950">{item.q}</h4>
+                <p className="mt-2 leading-7 text-slate-600">{item.a}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+    </section>
+  );
+}
+
+function TeacherGuidePanel({ contentUnlocked, onToggleContentUnlocked, steps }) {
+  return (
+    <div className="rounded-[2rem] bg-white p-6 shadow-xl shadow-slate-200/70 sm:p-8">
+      <div className="mb-6 flex items-start justify-between gap-4">
+        <div>
+          <PageEyebrow label="Teacher Guide" />
+          <h3 className="mt-3 text-2xl font-extrabold text-slate-950">คู่มืออาจารย์แบบทีละขั้นตอน</h3>
+          <p className="mt-3 leading-8 text-slate-600">ออกแบบให้ใช้งานง่าย เหมาะกับอาจารย์ที่ไม่ถนัดคอมพิวเตอร์</p>
+        </div>
+        <div className={`rounded-2xl p-3 ${contentUnlocked ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-500'}`}>
+          {contentUnlocked ? <Unlock size={28} /> : <Lock size={28} />}
+        </div>
+      </div>
+
+      <div className="rounded-3xl border border-slate-100 bg-slate-50 p-4">
+        <p className="text-sm font-bold text-slate-500">สถานะบทเรียนตอนนี้</p>
+        <p className={`mt-1 text-xl font-extrabold ${contentUnlocked ? 'text-emerald-600' : 'text-slate-700'}`}>
+          {contentUnlocked ? 'เปิดให้นักศึกษาเรียนแล้ว' : 'ยังล็อกไว้ รออาจารย์เปิด'}
+        </p>
+        <button
+          type="button"
+          onClick={() => onToggleContentUnlocked(!contentUnlocked)}
+          className={`mt-4 inline-flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-3 font-bold text-white shadow-lg transition sm:w-auto ${
+            contentUnlocked ? 'bg-slate-700 hover:bg-slate-800' : 'bg-emerald-500 shadow-emerald-500/20 hover:bg-emerald-600'
+          }`}
+        >
+          {contentUnlocked ? <Lock size={20} /> : <Unlock size={20} />}
+          {contentUnlocked ? 'ปิดบทเรียน' : 'เปิดบทเรียน'}
+        </button>
+      </div>
+
+      <ol className="mt-6 space-y-3">
+        {steps.map((step, index) => (
+          <li key={step} className="flex gap-3 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-orange-100 text-sm font-extrabold text-orange-600">
+              {index + 1}
+            </span>
+            <span className="leading-7 text-slate-700">{step}</span>
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+}
+
+function LockedContentGate({ onGoHome }) {
+  return (
+    <section className="mx-auto max-w-3xl rounded-[2rem] bg-white p-8 text-center shadow-2xl shadow-slate-200/80">
+      <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-3xl bg-slate-100 text-slate-500">
+        <Lock size={40} />
+      </div>
+      <h2 className="text-3xl font-extrabold text-slate-950">บทเรียนส่วนนี้ยังล็อกอยู่</h2>
+      <p className="mt-4 leading-8 text-slate-600">
+        กรุณาทำแบบทดสอบก่อนเรียน และรออาจารย์ผู้สอนเปิดบทเรียน เมื่อนั้นระบบจะแสดงเนื้อหาถัดไปให้เรียนต่อ
+      </p>
+      <button
+        type="button"
+        onClick={onGoHome}
+        className="mt-7 rounded-2xl bg-orange-500 px-6 py-3 font-bold text-white shadow-lg shadow-orange-500/25 transition hover:bg-orange-600"
+      >
+        กลับหน้า Home
+      </button>
+    </section>
+  );
 }
 
 function CoverPage({ page }) {
@@ -776,6 +1187,23 @@ function QuizPage({ page }) {
   const currentQuestion = page.questions[currentQuestionIndex];
   const percentage = Math.round((score / page.questions.length) * 100);
   const hasPassed = percentage >= 60;
+  const isPreTest = page.quizMode === 'pre';
+  const readiness =
+    percentage >= 80
+      ? 'มีพื้นฐานแข็งแรง พร้อมต่อยอดบทเรียน'
+      : percentage >= 60
+        ? 'เข้าใจภาพรวมดี ควรเรียนเพื่อเติมรายละเอียด'
+        : percentage >= 40
+          ? 'มีพื้นฐานบางส่วน ควรทบทวนตามบทเรียนอย่างครบถ้วน'
+          : 'ควรเริ่มเรียนจากพื้นฐาน เพื่อสร้างความเข้าใจทีละขั้น';
+
+  useEffect(() => {
+    setCurrentQuestionIndex(0);
+    setSelectedOption(null);
+    setIsAnswered(false);
+    setScore(0);
+    setShowResult(false);
+  }, [page.id]);
 
   const handleOptionClick = (optionIndex) => {
     if (isAnswered) return;
@@ -809,7 +1237,7 @@ function QuizPage({ page }) {
   return (
     <section className="mx-auto max-w-4xl">
       <div className="rounded-[2rem] bg-white p-6 shadow-2xl shadow-slate-200/80 sm:p-8 lg:p-10">
-        <PageEyebrow label="Post-Test" />
+        <PageEyebrow label={isPreTest ? 'Pre-Test' : 'Post-Test'} />
         <h2 className="mt-3 text-3xl font-extrabold text-slate-950 sm:text-5xl">{page.title}</h2>
         <p className="mt-4 text-lg leading-8 text-slate-600">{page.subtitle}</p>
 
@@ -822,10 +1250,21 @@ function QuizPage({ page }) {
             <h3 className="mt-2 text-6xl font-extrabold">
               {score}/{page.questions.length}
             </h3>
-            <p className={`mt-5 text-2xl font-bold ${hasPassed ? 'text-emerald-300' : 'text-red-300'}`}>
-              {hasPassed ? 'ผ่านเกณฑ์การประเมิน' : 'ยังไม่ผ่านเกณฑ์การประเมิน'}
-            </p>
-            <p className="mt-3 text-slate-300">เกณฑ์ผ่าน 60% คะแนนของคุณคือ {percentage}%</p>
+            {isPreTest ? (
+              <>
+                <p className="mt-5 text-2xl font-bold text-orange-200">
+                  ระดับความรู้ก่อนเรียนของคุณคือ {percentage}%
+                </p>
+                <p className="mt-3 text-slate-300">{readiness}</p>
+              </>
+            ) : (
+              <>
+                <p className={`mt-5 text-2xl font-bold ${hasPassed ? 'text-emerald-300' : 'text-red-300'}`}>
+                  {hasPassed ? 'ผ่านเกณฑ์การประเมิน' : 'ยังไม่ผ่านเกณฑ์การประเมิน'}
+                </p>
+                <p className="mt-3 text-slate-300">เกณฑ์ผ่าน 60% คะแนนของคุณคือ {percentage}%</p>
+              </>
+            )}
             <button
               type="button"
               onClick={restartQuiz}
