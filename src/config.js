@@ -11,6 +11,12 @@ export const DEFAULT_LESSON_CONTROLS = {
   courseTitle: 'การประกอบอาหารเบื้องต้น',
   classroomName: 'ห้องเรียนทั่วไป',
   announcement: '',
+  pretestMusicEnabled: false,
+  pretestMusicFile: '/audio/เรียน.mp3',
+  pretestMusicTitle: '',
+  pretestMusicRequireFinish: true,
+  pretestMusicSkippable: false,
+  pretestMusicVolume: 0.7,
 };
 
 export function isFirebaseConfigured() {

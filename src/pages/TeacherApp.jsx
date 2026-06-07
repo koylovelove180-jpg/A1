@@ -4,15 +4,18 @@ import {
   ExternalLink,
   Lock,
   LogOut,
+  Music,
+  PlayCircle,
   RotateCcw,
   Save,
   Unlock,
   UserCog,
 } from 'lucide-react';
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { TEACHER_EMAIL, TEACHER_USERNAME, isFirebaseConfigured } from '../config';
+import { PRETEST_MUSIC_OPTIONS, resolvePretestMusicUrl } from '../data/pretestMusicOptions';
 import { auth } from '../firebase';
 import { useLessonControls } from '../hooks/useLessonControls';
 
@@ -119,6 +122,36 @@ function TeacherLogin({ onLoginSuccess, error, loading }) {
   );
 }
 
+function MusicPreviewButton({ filePath, volume }) {
+  const audioRef = useRef(null);
+
+  const handlePreview = async () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.volume = Math.min(1, Math.max(0, Number(volume ?? 0.7)));
+    audio.currentTime = 0;
+    try {
+      await audio.play();
+    } catch {
+      // autoplay blocked — ignore
+    }
+  };
+
+  return (
+    <>
+      <audio ref={audioRef} src={resolvePretestMusicUrl(filePath)} preload="none" className="hidden" />
+      <button
+        type="button"
+        onClick={handlePreview}
+        className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 transition hover:border-orange-200 hover:text-orange-600"
+      >
+        <PlayCircle size={18} />
+        ฟังตัวอย่าง
+      </button>
+    </>
+  );
+}
+
 function TeacherDashboard({ user, onLogout }) {
   const { settings, loading, error, isRemote, saveSettings, resetSettings } = useLessonControls();
   const [draft, setDraft] = useState(settings);
@@ -221,16 +254,102 @@ function TeacherDashboard({ user, onLogout }) {
                 enabled={draft.postTestUnlocked}
                 onToggle={() => toggleField('postTestUnlocked')}
               />
+            </div>
+          </div>
+
+          <div className="rounded-[2rem] bg-white p-6 shadow-xl">
+            <div className="mb-5 flex items-center gap-3">
+              <div className="rounded-2xl bg-orange-100 p-3 text-orange-600">
+                <Music size={22} />
+              </div>
+              <div>
+                <h2 className="text-xl font-extrabold text-slate-950">แบบทดสอบก่อนเรียน</h2>
+                <p className="mt-1 text-sm text-slate-600">ตั้งค่า Pre-Test และเพลงก่อนเริ่มทำข้อสอบเท่านั้น</p>
+              </div>
+            </div>
+            <div className="space-y-3">
               <ToggleRow
                 label="บังคับทำ Pre-Test"
                 description="แนะนำให้เปิดไว้เพื่อวัดความรู้ก่อนเรียน"
                 enabled={draft.preTestRequired}
                 onToggle={() => toggleField('preTestRequired')}
               />
+              <ToggleRow
+                label="เปิดเพลงก่อนเริ่ม Pre-test"
+                description="นักเรียนจะเห็นหน้าฟังเพลงก่อนเข้าข้อสอบ Pre-Test"
+                enabled={draft.pretestMusicEnabled}
+                onToggle={() => toggleField('pretestMusicEnabled')}
+              />
+              {draft.pretestMusicEnabled && (
+                <div className="space-y-4 rounded-2xl border border-orange-100 bg-orange-50/50 p-4">
+                  <label className="block">
+                    <span className="text-sm font-semibold text-slate-700">เลือกเพลงสำหรับแบบทดสอบก่อนเรียน</span>
+                    <select
+                      value={draft.pretestMusicFile}
+                      onChange={(event) =>
+                        setDraft((current) => ({ ...current, pretestMusicFile: event.target.value }))
+                      }
+                      className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none ring-orange-200 focus:ring-2"
+                    >
+                      {PRETEST_MUSIC_OPTIONS.map((option) => (
+                        <option key={option.file} value={option.file}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="block">
+                    <span className="text-sm font-semibold text-slate-700">ชื่อเพลงแสดงบนหน้ intro (ไม่บังคับ)</span>
+                    <input
+                      type="text"
+                      value={draft.pretestMusicTitle}
+                      onChange={(event) =>
+                        setDraft((current) => ({ ...current, pretestMusicTitle: event.target.value }))
+                      }
+                      placeholder="เช่น เพลงก่อนเริ่มแบบทดสอบก่อนเรียน"
+                      className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none ring-orange-200 focus:ring-2"
+                    />
+                  </label>
+                  <ToggleRow
+                    label="ต้องฟังจบก่อนเริ่ม"
+                    description="ปุ่มเริ่มทำแบบทดสอบก่อนเรียนจะเปิดเมื่อเพลงเล่นจบ"
+                    enabled={draft.pretestMusicRequireFinish}
+                    onToggle={() => toggleField('pretestMusicRequireFinish')}
+                  />
+                  <ToggleRow
+                    label="อนุญาตข้ามเพลง"
+                    description="แสดงปุ่มข้ามเพลงแม้ยังฟังไม่จบ"
+                    enabled={draft.pretestMusicSkippable}
+                    onToggle={() => toggleField('pretestMusicSkippable')}
+                  />
+                  <label className="block">
+                    <span className="text-sm font-semibold text-slate-700">
+                      ระดับเสียง ({Math.round((draft.pretestMusicVolume ?? 0.7) * 100)}%)
+                    </span>
+                    <input
+                      type="range"
+                      min="0"
+                      max="1"
+                      step="0.05"
+                      value={draft.pretestMusicVolume ?? 0.7}
+                      onChange={(event) =>
+                        setDraft((current) => ({
+                          ...current,
+                          pretestMusicVolume: Number(event.target.value),
+                        }))
+                      }
+                      className="mt-3 w-full accent-orange-500"
+                    />
+                  </label>
+                  <MusicPreviewButton filePath={draft.pretestMusicFile} volume={draft.pretestMusicVolume} />
+                </div>
+              )}
             </div>
           </div>
+        </section>
 
-          <div className="rounded-[2rem] bg-white p-6 shadow-xl">
+        <section className="grid gap-6 lg:grid-cols-1">
+          <div className="rounded-[2rem] bg-white p-6 shadow-xl lg:col-span-1">
             <h2 className="text-xl font-extrabold text-slate-950">ข้อมูลห้องเรียน</h2>
             <div className="mt-5 space-y-4">
               <label className="block">

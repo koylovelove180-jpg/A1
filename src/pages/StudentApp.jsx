@@ -23,9 +23,11 @@ import {
   ZoomIn,
 } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
+import PreTestQuizFlow from '../components/PreTestQuizFlow';
 import { lessonData } from '../data/lessonData';
 import { useLessonControls } from '../hooks/useLessonControls';
 import { isPageLocked } from '../utils/lessonAccess';
+import { clearPretestMusicCompleted } from '../utils/pretestMusicStorage';
 
 const _removedLessonData = [
   {
@@ -437,6 +439,17 @@ function StudentApp() {
   const progress = ((activeIndex + 1) / lessonData.length) * 100;
   const isQuizPage = currentPage.type === 'quiz-interactive';
   const preTestIndex = lessonData.findIndex((page) => page.quizMode === 'pre');
+  const preTestPageId = preTestIndex >= 0 ? lessonData[preTestIndex].id : null;
+
+  useEffect(() => {
+    if (preTestPageId == null) return undefined;
+
+    if (activeIndex !== preTestIndex) {
+      clearPretestMusicCompleted(preTestPageId);
+    }
+
+    return undefined;
+  }, [activeIndex, preTestIndex, preTestPageId]);
 
   const goToPage = useCallback((index) => {
     const nextIndex = Math.min(Math.max(index, 0), lessonData.length - 1);
@@ -788,6 +801,9 @@ function ContentRenderer({ onSelectPage, page, preTestIndex, settings, settingsL
     case 'methods':
       return <MethodsPage page={page} />;
     case 'quiz-interactive':
+      if (page.quizMode === 'pre') {
+        return <PreTestQuizFlow page={page} settings={settings} QuizPage={QuizPage} />;
+      }
       return <QuizPage page={page} />;
     default:
       return null;
