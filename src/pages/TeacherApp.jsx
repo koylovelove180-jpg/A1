@@ -17,6 +17,7 @@ import { Link } from 'react-router-dom';
 import { TEACHER_EMAIL, TEACHER_USERNAME, isFirebaseConfigured } from '../config';
 import AnnouncementContent from '../components/AnnouncementContent';
 import AnnouncementQrTool from '../components/AnnouncementQrTool';
+import TeacherHelpVideo from '../components/TeacherHelpVideo';
 import { PRETEST_MUSIC_OPTIONS, resolvePretestMusicUrl } from '../data/pretestMusicOptions';
 import { auth } from '../firebase';
 import { useLessonControls } from '../hooks/useLessonControls';
@@ -62,63 +63,67 @@ function TeacherLogin({ onLoginSuccess, error, loading }) {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-10">
-      <div className="w-full max-w-md rounded-[2rem] bg-white p-8 shadow-2xl shadow-slate-200/80">
-        <div className="mb-6 inline-flex rounded-2xl bg-orange-100 p-4 text-orange-600">
-          <UserCog size={32} />
-        </div>
-        <h1 className="text-3xl font-extrabold text-slate-950">เข้าสู่ระบบอาจารย์</h1>
-        <p className="mt-3 leading-8 text-slate-600">
-          ใช้ username <span className="font-bold">{TEACHER_USERNAME}</span> และรหัสผ่านที่ตั้งใน Firebase Auth
-        </p>
-
-        {!isFirebaseConfigured() && (
-          <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-7 text-amber-900">
-            ยังไม่ได้ตั้งค่า Firebase — ระบบใช้โหมดทดสอบในเครื่อง (localStorage) สำหรับบันทึกการตั้งค่า
+      <div className="w-full max-w-2xl space-y-6">
+        <div className="rounded-[2rem] bg-white p-8 shadow-2xl shadow-slate-200/80">
+          <div className="mb-6 inline-flex rounded-2xl bg-orange-100 p-4 text-orange-600">
+            <UserCog size={32} />
           </div>
-        )}
+          <h1 className="text-3xl font-extrabold text-slate-950">เข้าสู่ระบบอาจารย์</h1>
+          <p className="mt-3 leading-8 text-slate-600">
+            ใช้ username <span className="font-bold">{TEACHER_USERNAME}</span> และรหัสผ่านที่ตั้งใน Firebase Auth
+          </p>
 
-        <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
-          <label className="block">
-            <span className="text-sm font-semibold text-slate-700">Username</span>
-            <input
-              type="text"
-              value={username}
-              onChange={(event) => setUsername(event.target.value)}
-              className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none ring-orange-200 focus:ring-2"
-              autoComplete="username"
-            />
-          </label>
-          <label className="block">
-            <span className="text-sm font-semibold text-slate-700">Password</span>
-            <input
-              type="password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none ring-orange-200 focus:ring-2"
-              autoComplete="current-password"
-            />
-          </label>
+          {!isFirebaseConfigured() && (
+            <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-7 text-amber-900">
+              ยังไม่ได้ตั้งค่า Firebase — ระบบใช้โหมดทดสอบในเครื่อง (localStorage) สำหรับบันทึกการตั้งค่า
+            </div>
+          )}
 
-          {error ? (
-            <p className="rounded-2xl bg-red-50 p-3 text-sm font-semibold text-red-700">{error}</p>
-          ) : null}
+          <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
+            <label className="block">
+              <span className="text-sm font-semibold text-slate-700">Username</span>
+              <input
+                type="text"
+                value={username}
+                onChange={(event) => setUsername(event.target.value)}
+                className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none ring-orange-200 focus:ring-2"
+                autoComplete="username"
+              />
+            </label>
+            <label className="block">
+              <span className="text-sm font-semibold text-slate-700">Password</span>
+              <input
+                type="password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none ring-orange-200 focus:ring-2"
+                autoComplete="current-password"
+              />
+            </label>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-orange-500 px-5 py-3 font-bold text-white shadow-lg transition hover:bg-orange-600 disabled:opacity-60"
+            {error ? (
+              <p className="rounded-2xl bg-red-50 p-3 text-sm font-semibold text-red-700">{error}</p>
+            ) : null}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-orange-500 px-5 py-3 font-bold text-white shadow-lg transition hover:bg-orange-600 disabled:opacity-60"
+            >
+              {loading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ'}
+            </button>
+          </form>
+
+          <Link
+            to="/student"
+            className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-orange-600 hover:text-orange-700"
           >
-            {loading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ'}
-          </button>
-        </form>
+            <ExternalLink size={16} />
+            ไปหน้านักศึกษา
+          </Link>
+        </div>
 
-        <Link
-          to="/student"
-          className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-orange-600 hover:text-orange-700"
-        >
-          <ExternalLink size={16} />
-          ไปหน้านักศึกษา
-        </Link>
+        <TeacherHelpVideo compact />
       </div>
     </div>
   );
@@ -446,7 +451,9 @@ function TeacherDashboard({ user, onLogout }) {
         </div>
 
         <section className="rounded-[2rem] bg-white p-6 shadow-xl sm:p-8">
-          <div className="mb-6 flex items-center gap-3">
+          <TeacherHelpVideo />
+
+          <div className="mb-6 mt-8 flex items-center gap-3">
             <div className="rounded-2xl bg-orange-100 p-3 text-orange-600">
               <BookOpen size={24} />
             </div>
