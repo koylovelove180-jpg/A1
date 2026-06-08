@@ -1,18 +1,47 @@
-rules_version='2'
+rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      // This rule allows anyone with your database reference to view, edit,
-      // and delete all data in your database. It is useful for getting
-      // started, but it is configured to expire after 30 days because it
-      // leaves your app open to attackers. At that time, all client
-      // requests to your database will be denied.
-      //
-      // Make sure to write security rules for your app before that time, or
-      // else all client requests to your database will be denied until you
-      // update your rules.
-      allow read, write: if request.time < timestamp.date(2026, 7, 8);
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Students use the app without signing in; only teachers authenticate via Firebase Auth.
+    function isTeacher() {
+      return isAuthenticated();
+    }
+
+    function quizAttemptValidCreate() {
+      let data = request.resource.data;
+      return data.keys().hasAll(['classroomId', 'courseId', 'pageId', 'quizMode', 'score', 'total', 'passed', 'percentage', 'studentId', 'completedAt'])
+        && data.classroomId is string
+        && data.courseId is string
+        && data.pageId is number
+        && data.quizMode in ['pre', 'post']
+        && data.score is int
+        && data.total is int
+        && data.total > 0
+        && data.score >= 0
+        && data.score <= data.total
+        && data.percentage is int
+        && data.percentage >= 0
+        && data.percentage <= 100
+        && data.passed is bool
+        && data.studentId is string
+        && data.studentId.size() >= 8
+        && data.completedAt is string;
+    }
+
+    match /lessonControls/{classroomId} {
+      allow read: if true;
+      allow create, update: if isTeacher();
+      allow delete: if isTeacher();
+    }
+
+    match /quizAttempts/{attemptId} {
+      allow read: if isTeacher();
+      allow create: if quizAttemptValidCreate();
+      allow update, delete: if isTeacher();
     }
   }
 }

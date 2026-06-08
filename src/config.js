@@ -2,6 +2,8 @@ export const TEACHER_USERNAME = 'admin';
 export const TEACHER_EMAIL = import.meta.env.VITE_TEACHER_EMAIL || 'teacher.admin@example.com';
 
 export const LESSON_CONTROLS_COLLECTION = 'lessonControls';
+
+/** @deprecated Use DEFAULT_COURSE_ID from coursesRegistry */
 export const LESSON_CONTROLS_DOC = 'cooking-basics';
 
 export const DEFAULT_LESSON_CONTROLS = {

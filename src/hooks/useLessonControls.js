@@ -1,34 +1,53 @@
 import { doc, onSnapshot, serverTimestamp, setDoc } from 'firebase/firestore';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   DEFAULT_LESSON_CONTROLS,
   LESSON_CONTROLS_COLLECTION,
-  LESSON_CONTROLS_DOC,
   isFirebaseConfigured,
 } from '../config';
+import { resolveClassroomId } from '../data/coursesRegistry';
 import { db } from '../firebase';
 
-const LOCAL_STORAGE_KEY = 'lessonControlsFallback';
+function localStorageKey(classroomId) {
+  return `lessonControlsFallback_${classroomId}`;
+}
 
-function readLocalControls() {
+function readLocalControls(classroomId) {
   try {
-    const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
-    if (!raw) return { ...DEFAULT_LESSON_CONTROLS };
-    return { ...DEFAULT_LESSON_CONTROLS, ...JSON.parse(raw) };
+    const key = localStorageKey(classroomId);
+    let raw = localStorage.getItem(key);
+    if (!raw && classroomId === 'cooking-basics') {
+      const legacy = localStorage.getItem('lessonControlsFallback');
+      if (legacy) {
+        localStorage.setItem(key, legacy);
+        raw = legacy;
+      }
+    }
+    if (!raw) return { ...DEFAULT_LESSON_CONTROLS, courseId: classroomId };
+    return { ...DEFAULT_LESSON_CONTROLS, courseId: classroomId, ...JSON.parse(raw) };
   } catch {
-    return { ...DEFAULT_LESSON_CONTROLS };
+    return { ...DEFAULT_LESSON_CONTROLS, courseId: classroomId };
   }
 }
 
-function writeLocalControls(nextSettings) {
-  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(nextSettings));
+function writeLocalControls(classroomId, nextSettings) {
+  localStorage.setItem(localStorageKey(classroomId), JSON.stringify(nextSettings));
 }
 
-export function useLessonControls() {
-  const [settings, setSettings] = useState(() => readLocalControls());
+export function useLessonControls(courseId) {
+  const classroomId = useMemo(
+    () => (courseId ? resolveClassroomId(courseId) : resolveClassroomId()),
+    [courseId],
+  );
+
+  const [settings, setSettings] = useState(() => readLocalControls(classroomId));
   const [loading, setLoading] = useState(isFirebaseConfigured());
   const [error, setError] = useState('');
   const [isRemote, setIsRemote] = useState(isFirebaseConfigured());
+
+  useEffect(() => {
+    setSettings(readLocalControls(classroomId));
+  }, [classroomId]);
 
   useEffect(() => {
     if (!isFirebaseConfigured() || !db) {
@@ -37,15 +56,15 @@ export function useLessonControls() {
       return undefined;
     }
 
-    const ref = doc(db, LESSON_CONTROLS_COLLECTION, LESSON_CONTROLS_DOC);
+    const ref = doc(db, LESSON_CONTROLS_COLLECTION, classroomId);
 
     const unsubscribe = onSnapshot(
       ref,
       (snapshot) => {
         if (snapshot.exists()) {
-          setSettings({ ...DEFAULT_LESSON_CONTROLS, ...snapshot.data() });
+          setSettings({ ...DEFAULT_LESSON_CONTROLS, courseId: classroomId, ...snapshot.data() });
         } else {
-          setSettings({ ...DEFAULT_LESSON_CONTROLS });
+          setSettings({ ...DEFAULT_LESSON_CONTROLS, courseId: classroomId });
         }
         setLoading(false);
         setError('');
@@ -53,43 +72,45 @@ export function useLessonControls() {
       },
       (snapshotError) => {
         setError(snapshotError.message);
-        setSettings(readLocalControls());
+        setSettings(readLocalControls(classroomId));
         setLoading(false);
         setIsRemote(false);
       },
     );
 
     return unsubscribe;
-  }, []);
+  }, [classroomId]);
 
   useEffect(() => {
     if (isFirebaseConfigured()) return undefined;
 
+    const key = localStorageKey(classroomId);
     const onStorage = (event) => {
-      if (event.key === LOCAL_STORAGE_KEY) {
-        setSettings(readLocalControls());
+      if (event.key === key) {
+        setSettings(readLocalControls(classroomId));
       }
     };
 
     window.addEventListener('storage', onStorage);
     return () => window.removeEventListener('storage', onStorage);
-  }, []);
+  }, [classroomId]);
 
   const saveSettings = useCallback(async (partialSettings, updatedBy = 'teacher') => {
     const nextSettings = {
       ...settings,
       ...partialSettings,
+      courseId: classroomId,
       updatedAt: new Date().toISOString(),
       updatedBy,
     };
 
     if (!isFirebaseConfigured() || !db) {
-      writeLocalControls(nextSettings);
+      writeLocalControls(classroomId, nextSettings);
       setSettings(nextSettings);
       return nextSettings;
     }
 
-    const ref = doc(db, LESSON_CONTROLS_COLLECTION, LESSON_CONTROLS_DOC);
+    const ref = doc(db, LESSON_CONTROLS_COLLECTION, classroomId);
     await setDoc(
       ref,
       {
@@ -100,17 +121,19 @@ export function useLessonControls() {
     );
 
     return nextSettings;
-  }, [settings]);
+  }, [classroomId, settings]);
 
   const resetSettings = useCallback(async (updatedBy = 'teacher') => {
-    return saveSettings({ ...DEFAULT_LESSON_CONTROLS }, updatedBy);
-  }, [saveSettings]);
+    return saveSettings({ ...DEFAULT_LESSON_CONTROLS, courseId: classroomId }, updatedBy);
+  }, [classroomId, saveSettings]);
 
   return {
     settings,
     loading,
     error,
     isRemote,
+    classroomId,
+    courseId: classroomId,
     saveSettings,
     resetSettings,
   };

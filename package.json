@@ -8,6 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "check:locales": "node scripts/check-locale-keys.mjs",
+    "migrate:postgres": "node scripts/migrate-lesson-data-to-postgres.mjs",
     "firebase:deploy": "firebase deploy --only firestore:rules,auth",
     "firebase:verify": "node scripts/verify-firebase.mjs"
   },

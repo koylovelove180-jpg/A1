@@ -17,5 +17,6 @@
   "dashboard.stats.required": "บังคับ",
   "dashboard.stats.optional": "ไม่บังคับ",
   "dashboard.footer.help": "ต้องการความช่วยเหลือ?",
-  "dashboard.footer.manualLink": "เปิดคู่มือฉบับเต็ม"
+  "dashboard.footer.manualLink": "เปิดคู่มือฉบับเต็ม",
+  "dashboard.courses.title": "รายวิชาที่เปิดสอน"
 }

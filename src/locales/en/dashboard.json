@@ -17,5 +17,6 @@
   "dashboard.stats.required": "Required",
   "dashboard.stats.optional": "Optional",
   "dashboard.footer.help": "Need help?",
-  "dashboard.footer.manualLink": "Open full manual"
+  "dashboard.footer.manualLink": "Open full manual",
+  "dashboard.courses.title": "Available courses"
 }

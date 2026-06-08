@@ -13,14 +13,16 @@ import {
 } from 'lucide-react';
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import LocaleThemeControls from '../components/dashboard/LocaleThemeControls';
 import DashboardLayout from '../layouts/DashboardLayout';
+import TeacherGradeExport from '../components/TeacherGradeExport';
 import { useAppLocale } from '../i18n/AppLocaleProvider';
 import { TEACHER_EMAIL, TEACHER_USERNAME, isFirebaseConfigured } from '../config';
 import AnnouncementContent from '../components/AnnouncementContent';
 import AnnouncementQrTool from '../components/AnnouncementQrTool';
 import TeacherHelpVideo from '../components/TeacherHelpVideo';
+import { DEFAULT_COURSE_ID, getCourseList, isValidCourseId } from '../data/coursesRegistry';
 import { PRETEST_MUSIC_OPTIONS, resolvePretestMusicUrl } from '../data/pretestMusicOptions';
 import { auth } from '../firebase';
 import { useLessonControls } from '../hooks/useLessonControls';
@@ -124,7 +126,7 @@ function TeacherLogin({ onLoginSuccess, error, loading }) {
           </form>
 
           <Link
-            to="/student"
+            to={`/student/${DEFAULT_COURSE_ID}`}
             className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-orange-600 hover:text-orange-700"
           >
             <ExternalLink size={16} />
@@ -176,9 +178,11 @@ function MusicPreviewButton({ filePath, volume }) {
   );
 }
 
-function TeacherDashboard({ user, onLogout }) {
+function TeacherDashboard({ user, onLogout, courseId }) {
   const { t } = useAppLocale();
-  const { settings, loading, error, isRemote, saveSettings, resetSettings } = useLessonControls();
+  const navigate = useNavigate();
+  const courses = getCourseList();
+  const { settings, loading, error, isRemote, classroomId, saveSettings, resetSettings } = useLessonControls(courseId);
   const [draft, setDraft] = useState(settings);
   const [saveMessage, setSaveMessage] = useState('');
   const [saveError, setSaveError] = useState('');
@@ -223,7 +227,7 @@ function TeacherDashboard({ user, onLogout }) {
   const topBarActions = (
     <>
       <Link
-        to="/student"
+        to={`/student/${courseId}`}
         className="hidden items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 transition hover:border-orange-200 hover:text-orange-600 sm:inline-flex dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
       >
         <ExternalLink size={16} />
@@ -249,6 +253,23 @@ function TeacherDashboard({ user, onLogout }) {
             {user?.email || t('teacher.dashboard.modeLocal')} ·{' '}
             {isRemote ? t('teacher.dashboard.modeFirestore') : t('teacher.dashboard.modeLocalStorage')}
           </p>
+        </div>
+
+        <div className="rounded-[2rem] bg-white p-6 shadow-xl dark:bg-slate-900">
+          <label className="block">
+            <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">{t('teacher.course.select')}</span>
+            <select
+              value={courseId}
+              onChange={(event) => navigate(`/teacher/${event.target.value}`)}
+              className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none ring-orange-200 focus:ring-2 dark:border-slate-700 dark:bg-slate-900"
+            >
+              {courses.map((course) => (
+                <option key={course.id} value={course.id}>
+                  {course.id}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
 
         {(error || saveError) && (
@@ -469,6 +490,8 @@ function TeacherDashboard({ user, onLogout }) {
           </button>
         </div>
 
+        <TeacherGradeExport classroomId={classroomId} courseId={courseId} />
+
         <section className="rounded-[2rem] bg-white p-6 shadow-xl dark:bg-slate-900 sm:p-8">
           <TeacherHelpVideo />
           <Link
@@ -512,6 +535,8 @@ function TeacherDashboard({ user, onLogout }) {
 }
 
 function TeacherApp() {
+  const { courseId: routeCourseId } = useParams();
+  const courseId = routeCourseId && isValidCourseId(routeCourseId) ? routeCourseId : DEFAULT_COURSE_ID;
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [loginLoading, setLoginLoading] = useState(false);
@@ -585,7 +610,11 @@ function TeacherApp() {
     );
   }
 
-  return <TeacherDashboard user={user} onLogout={handleLogout} />;
+  if (routeCourseId && !isValidCourseId(routeCourseId)) {
+    return <Navigate to={`/teacher/${DEFAULT_COURSE_ID}`} replace />;
+  }
+
+  return <TeacherDashboard user={user} onLogout={handleLogout} courseId={courseId} />;
 }
 
 export default TeacherApp;

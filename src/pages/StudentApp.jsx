@@ -22,17 +22,18 @@ import {
   XCircle,
   ZoomIn,
 } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Link, Navigate, useParams } from 'react-router-dom';
 import LocaleThemeControls from '../components/dashboard/LocaleThemeControls';
 import PreTestQuizFlow from '../components/PreTestQuizFlow';
 import AnnouncementContent from '../components/AnnouncementContent';
 import { useAppLocale } from '../i18n/AppLocaleProvider';
-import { lessonData } from '../data/lessonData';
+import { DEFAULT_COURSE_ID, getCourse, isValidCourseId } from '../data/coursesRegistry';
 import { useLessonControls } from '../hooks/useLessonControls';
 import { isPageLocked } from '../utils/lessonAccess';
 import { isAnnouncementEmpty } from '../utils/announcementHtml';
 import { clearPretestMusicCompleted } from '../utils/pretestMusicStorage';
+import { saveQuizAttempt } from '../utils/quizPersistence';
 
 const _removedLessonData = [
   {
@@ -434,8 +435,11 @@ function quizImageSrc(value, size = 'thumb') {
 }
 
 function StudentApp() {
+  const { courseId: routeCourseId } = useParams();
+  const courseId = routeCourseId && isValidCourseId(routeCourseId) ? routeCourseId : DEFAULT_COURSE_ID;
+  const { lessonData } = getCourse(courseId);
   const { t } = useAppLocale();
-  const { settings, loading: settingsLoading } = useLessonControls();
+  const { settings, loading: settingsLoading, classroomId } = useLessonControls(courseId);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -471,7 +475,7 @@ function StudentApp() {
     setActiveIndex(nextIndex);
     setIsSidebarOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [settings]);
+  }, [settings, lessonData]);
 
   const goNext = useCallback(() => {
     setActiveIndex((index) => {
@@ -487,7 +491,7 @@ function StudentApp() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return nextIndex;
     });
-  }, [settings]);
+  }, [settings, lessonData]);
 
   const goPrevious = useCallback(() => {
     setActiveIndex((index) => Math.max(index - 1, 0));
@@ -552,6 +556,10 @@ function StudentApp() {
     setTouchStartX(null);
   };
 
+  if (routeCourseId && !isValidCourseId(routeCourseId)) {
+    return <Navigate to={`/student/${DEFAULT_COURSE_ID}`} replace />;
+  }
+
   return (
     <div
       className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100"
@@ -606,6 +614,8 @@ function StudentApp() {
             preTestIndex={preTestIndex}
             settings={settings}
             settingsLoading={settingsLoading}
+            courseId={courseId}
+            classroomId={classroomId}
           />
         </div>
       </main>
@@ -781,7 +791,7 @@ function BottomNavigation({ activeIndex, settings, total, onNext, onPrevious }) 
   );
 }
 
-function ContentRenderer({ onSelectPage, page, preTestIndex, settings, settingsLoading }) {
+function ContentRenderer({ onSelectPage, page, preTestIndex, settings, settingsLoading, courseId, classroomId }) {
   if (settingsLoading) {
     return (
       <section className="mx-auto max-w-3xl rounded-[2rem] bg-white p-10 text-center shadow-xl">
@@ -814,9 +824,17 @@ function ContentRenderer({ onSelectPage, page, preTestIndex, settings, settingsL
       return <MethodsPage page={page} />;
     case 'quiz-interactive':
       if (page.quizMode === 'pre') {
-        return <PreTestQuizFlow page={page} settings={settings} QuizPage={QuizPage} />;
+        return (
+          <PreTestQuizFlow
+            page={page}
+            settings={settings}
+            QuizPage={(props) => (
+              <QuizPage {...props} courseId={courseId} classroomId={classroomId} />
+            )}
+          />
+        );
       }
-      return <QuizPage page={page} />;
+      return <QuizPage page={page} courseId={courseId} classroomId={classroomId} />;
     default:
       return null;
   }
@@ -1303,12 +1321,13 @@ function QuizQuestionMedia({ question }) {
   );
 }
 
-function QuizPage({ page }) {
+function QuizPage({ page, courseId, classroomId }) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
   const [isAnswered, setIsAnswered] = useState(false);
   const [score, setScore] = useState(0);
   const [showResult, setShowResult] = useState(false);
+  const savedAttemptRef = useRef(false);
   const currentQuestion = page.questions[currentQuestionIndex];
   const percentage = Math.round((score / page.questions.length) * 100);
   const hasPassed = percentage >= 60;
@@ -1328,7 +1347,24 @@ function QuizPage({ page }) {
     setIsAnswered(false);
     setScore(0);
     setShowResult(false);
+    savedAttemptRef.current = false;
   }, [page.id]);
+
+  useEffect(() => {
+    if (!showResult || savedAttemptRef.current || !classroomId || !courseId) return;
+    savedAttemptRef.current = true;
+    saveQuizAttempt({
+      classroomId,
+      courseId,
+      pageId: page.id,
+      quizMode: page.quizMode || 'post',
+      score,
+      total: page.questions.length,
+      passed: hasPassed,
+    }).catch(() => {
+      savedAttemptRef.current = false;
+    });
+  }, [showResult, score, hasPassed, classroomId, courseId, page.id, page.quizMode, page.questions.length]);
 
   const handleOptionClick = (optionIndex) => {
     if (isAnswered) return;

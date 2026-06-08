@@ -60,5 +60,21 @@
   "teacher.guide.step3": "Wait for students to finish the pre-test",
   "teacher.guide.step4": "Check classroom status in the control panel below",
   "teacher.guide.step5": "Unlock lessons when students should see content",
-  "teacher.guide.step6": "Enable Post-Test when ready for the post-test"
+  "teacher.guide.step6": "Enable Post-Test when ready for the post-test",
+  "teacher.course.select": "Select course / classroom",
+  "teacher.grades.eyebrow": "Quiz Grades",
+  "teacher.grades.title": "Quiz scores",
+  "teacher.grades.desc": "Pre-Test and Post-Test results from students — export as CSV",
+  "teacher.grades.refresh": "Refresh",
+  "teacher.grades.export": "Export CSV",
+  "teacher.grades.loading": "Loading...",
+  "teacher.grades.empty": "No scores yet",
+  "teacher.grades.loadError": "Failed to load scores",
+  "teacher.grades.colTime": "Time",
+  "teacher.grades.colStudent": "Student ID",
+  "teacher.grades.colQuiz": "Quiz",
+  "teacher.grades.colScore": "Score",
+  "teacher.grades.colPassed": "Passed",
+  "teacher.grades.yes": "Yes",
+  "teacher.grades.no": "No"
 }

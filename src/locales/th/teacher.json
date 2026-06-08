@@ -60,5 +60,21 @@
   "teacher.guide.step3": "รอให้นักศึกษาทำแบบทดสอบก่อนเรียนเสร็จ",
   "teacher.guide.step4": "ตรวจสถานะห้องเรียนในแผงควบคุมด้านล่าง",
   "teacher.guide.step5": "กดเปิดบทเรียน เมื่อต้องการให้นักศึกษาเห็นเนื้อหา",
-  "teacher.guide.step6": "เปิด Post-Test เมื่อพร้อมให้ทำแบบทดสอบหลังเรียน"
+  "teacher.guide.step6": "เปิด Post-Test เมื่อพร้อมให้ทำแบบทดสอบหลังเรียน",
+  "teacher.course.select": "เลือกรายวิชา / ห้องเรียน",
+  "teacher.grades.eyebrow": "Quiz Grades",
+  "teacher.grades.title": "คะแนนแบบทดสอบ",
+  "teacher.grades.desc": "บันทึกจาก Pre-Test และ Post-Test ของนักเรียน — ส่งออกเป็น CSV ได้",
+  "teacher.grades.refresh": "โหลดใหม่",
+  "teacher.grades.export": "ส่งออก CSV",
+  "teacher.grades.loading": "กำลังโหลด...",
+  "teacher.grades.empty": "ยังไม่มีคะแนน",
+  "teacher.grades.loadError": "โหลดคะแนนไม่สำเร็จ",
+  "teacher.grades.colTime": "เวลา",
+  "teacher.grades.colStudent": "รหัสนักเรียน",
+  "teacher.grades.colQuiz": "แบบทดสอบ",
+  "teacher.grades.colScore": "คะแนน",
+  "teacher.grades.colPassed": "ผ่าน",
+  "teacher.grades.yes": "ผ่าน",
+  "teacher.grades.no": "ไม่ผ่าน"
 }

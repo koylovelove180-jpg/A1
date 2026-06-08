@@ -13,8 +13,10 @@ function App() {
         <Route element={<DashboardLayout variant="portal" />}>
           <Route path="/dashboard" element={<DashboardHome />} />
         </Route>
-        <Route path="/student" element={<StudentApp />} />
-        <Route path="/teacher" element={<TeacherApp />} />
+        <Route path="/student" element={<Navigate to="/student/cooking-basics" replace />} />
+        <Route path="/student/:courseId" element={<StudentApp />} />
+        <Route path="/teacher" element={<Navigate to="/teacher/cooking-basics" replace />} />
+        <Route path="/teacher/:courseId" element={<TeacherApp />} />
         <Route path="/manual/*" element={<ManualApp />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>

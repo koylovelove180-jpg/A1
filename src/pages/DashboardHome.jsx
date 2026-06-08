@@ -3,11 +3,13 @@ import { Link } from 'react-router-dom';
 import RoleCard from '../components/dashboard/RoleCard';
 import StatCard from '../components/dashboard/StatCard';
 import { useAppLocale } from '../i18n/AppLocaleProvider';
+import { DEFAULT_COURSE_ID, getCourseList } from '../data/coursesRegistry';
 import { useLessonControls } from '../hooks/useLessonControls';
 
 function DashboardHome() {
   const { t } = useAppLocale();
-  const { settings } = useLessonControls();
+  const { settings } = useLessonControls(DEFAULT_COURSE_ID);
+  const courses = getCourseList();
 
   const lessonStatus = settings.contentUnlocked ? t('dashboard.stats.unlocked') : t('dashboard.stats.locked');
   const postStatus = settings.postTestUnlocked ? t('dashboard.stats.unlocked') : t('dashboard.stats.locked');
@@ -31,13 +33,13 @@ function DashboardHome() {
 
       <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
         <RoleCard
-          to="/student"
+          to={`/student/${DEFAULT_COURSE_ID}`}
           icon={GraduationCap}
           title={t('dashboard.roles.student')}
           description={t('dashboard.roles.studentDesc')}
         />
         <RoleCard
-          to="/teacher"
+          to={`/teacher/${DEFAULT_COURSE_ID}`}
           icon={UserCog}
           title={t('dashboard.roles.teacher')}
           description={t('dashboard.roles.teacherDesc')}
@@ -51,6 +53,24 @@ function DashboardHome() {
           accent="slate"
         />
       </div>
+
+      {courses.length > 1 && (
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
+          <p className="font-bold text-slate-950 dark:text-white">{t('dashboard.courses.title')}</p>
+          <ul className="mt-3 space-y-2">
+            {courses.map((course) => (
+              <li key={course.id}>
+                <Link
+                  to={`/student/${course.id}`}
+                  className="text-sm font-bold text-orange-600 hover:underline"
+                >
+                  {course.id}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <footer className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
         <p className="font-bold text-slate-950 dark:text-white">{t('dashboard.footer.help')}</p>
