@@ -1,0 +1,29 @@
+:root {
+  --bg-page: #f8fafc;
+  --bg-surface: #ffffff;
+  --text-primary: #0f172a;
+  --text-muted: #64748b;
+  --accent: #f97316;
+  --border: #e2e8f0;
+  --sidebar-width: 280px;
+}
+
+html.dark {
+  --bg-page: #0f172a;
+  --bg-surface: #1e293b;
+  --text-primary: #f1f5f9;
+  --text-muted: #94a3b8;
+  --accent: #fb923c;
+  --border: #334155;
+}
+
+body {
+  background: var(--bg-page);
+  color: var(--text-primary);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.dashboard-surface {
+  background: var(--bg-surface);
+  border-color: var(--border);
+}

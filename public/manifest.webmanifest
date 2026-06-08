@@ -1,0 +1,19 @@
+{
+  "name": "E-Learning Manual",
+  "short_name": "Manual",
+  "description": "Student and teacher user manual for the cooking e-learning app",
+  "start_url": "/manual",
+  "scope": "/manual",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#f97316",
+  "lang": "th",
+  "icons": [
+    {
+      "src": "/help/help_First_Frame.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

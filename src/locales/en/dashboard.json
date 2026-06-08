@@ -1,0 +1,21 @@
+{
+  "dashboard.hero.eyebrow": "E-Learning Portal",
+  "dashboard.hero.title": "Welcome to E-Learning",
+  "dashboard.hero.subtitle": "Choose your role to get started — Introductory Cooking",
+  "dashboard.roles.student": "Student",
+  "dashboard.roles.studentDesc": "Take Pre-Test, study lessons, and Post-Test",
+  "dashboard.roles.teacher": "Teacher",
+  "dashboard.roles.teacherDesc": "Control classroom, settings, and announcements",
+  "dashboard.roles.manual": "User Manual",
+  "dashboard.roles.manualDesc": "Find answers and step-by-step guides",
+  "dashboard.stats.classroom": "Classroom status",
+  "dashboard.stats.lessons": "Lessons",
+  "dashboard.stats.pretest": "Pre-Test",
+  "dashboard.stats.posttest": "Post-Test",
+  "dashboard.stats.unlocked": "Unlocked",
+  "dashboard.stats.locked": "Locked",
+  "dashboard.stats.required": "Required",
+  "dashboard.stats.optional": "Optional",
+  "dashboard.footer.help": "Need help?",
+  "dashboard.footer.manualLink": "Open full manual"
+}

@@ -23,8 +23,11 @@ import {
   ZoomIn,
 } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import LocaleThemeControls from '../components/dashboard/LocaleThemeControls';
 import PreTestQuizFlow from '../components/PreTestQuizFlow';
 import AnnouncementContent from '../components/AnnouncementContent';
+import { useAppLocale } from '../i18n/AppLocaleProvider';
 import { lessonData } from '../data/lessonData';
 import { useLessonControls } from '../hooks/useLessonControls';
 import { isPageLocked } from '../utils/lessonAccess';
@@ -431,6 +434,7 @@ function quizImageSrc(value, size = 'thumb') {
 }
 
 function StudentApp() {
+  const { t } = useAppLocale();
   const { settings, loading: settingsLoading } = useLessonControls();
   const [activeIndex, setActiveIndex] = useState(0);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -550,7 +554,7 @@ function StudentApp() {
 
   return (
     <div
-      className="min-h-screen bg-slate-50 text-slate-900"
+      className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
@@ -578,14 +582,15 @@ function StudentApp() {
 
       <main className="lg:pl-80">
         <div className="mx-auto min-h-screen max-w-7xl px-4 pb-28 pt-20 sm:px-6 lg:px-10 lg:pt-10">
-          <div className="mb-6 hidden justify-end lg:flex">
+          <div className="mb-6 hidden items-center justify-end gap-3 lg:flex">
+            <LocaleThemeControls />
             <button
               type="button"
               onClick={toggleFullscreen}
-              className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-orange-200 hover:text-orange-600"
+              className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-orange-200 hover:text-orange-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
             >
               {isFullscreen ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
-              {isFullscreen ? 'ออกจากเต็มจอ' : 'เต็มจอ'}
+              {isFullscreen ? t('student.header.exitFullscreen') : t('student.header.fullscreenBtn')}
             </button>
           </div>
 
@@ -617,28 +622,33 @@ function StudentApp() {
 }
 
 function MobileHeader({ isFullscreen, onMenuClick, onFullscreenClick }) {
+  const { t } = useAppLocale();
+
   return (
-    <header className="fixed inset-x-0 top-1 z-40 flex items-center justify-between border-b border-white/70 bg-white/85 px-4 py-3 shadow-sm backdrop-blur-xl lg:hidden">
+    <header className="fixed inset-x-0 top-1 z-40 flex items-center justify-between gap-2 border-b border-white/70 bg-white/85 px-3 py-3 shadow-sm backdrop-blur-xl dark:border-slate-800 dark:bg-slate-900/90 lg:hidden">
       <button
         type="button"
         onClick={onMenuClick}
-        className="rounded-2xl bg-slate-100 p-3 text-slate-700 transition hover:bg-orange-100 hover:text-orange-600"
-        aria-label="เปิดเมนูบทเรียน"
+        className="rounded-2xl bg-slate-100 p-3 text-slate-700 transition hover:bg-orange-100 hover:text-orange-600 dark:bg-slate-800 dark:text-slate-200"
+        aria-label={t('student.header.menu')}
       >
         <Menu size={22} />
       </button>
-      <div className="text-center">
+      <div className="min-w-0 flex-1 text-center">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-orange-500">E-Learning</p>
-        <p className="text-sm font-bold text-slate-900">การประกอบอาหาร</p>
+        <p className="truncate text-sm font-bold text-slate-900 dark:text-white">{t('student.header.brand')}</p>
       </div>
-      <button
-        type="button"
-        onClick={onFullscreenClick}
-        className="rounded-2xl bg-slate-100 p-3 text-slate-700 transition hover:bg-orange-100 hover:text-orange-600"
-        aria-label="สลับโหมดเต็มจอ"
-      >
-        {isFullscreen ? <Minimize2 size={20} /> : <Maximize2 size={20} />}
-      </button>
+      <div className="flex items-center gap-1">
+        <LocaleThemeControls compact />
+        <button
+          type="button"
+          onClick={onFullscreenClick}
+          className="rounded-2xl bg-slate-100 p-3 text-slate-700 transition hover:bg-orange-100 hover:text-orange-600 dark:bg-slate-800 dark:text-slate-200"
+          aria-label={isFullscreen ? t('student.header.exitFullscreen') : t('student.header.fullscreen')}
+        >
+          {isFullscreen ? <Minimize2 size={20} /> : <Maximize2 size={20} />}
+        </button>
+      </div>
     </header>
   );
 }
@@ -813,48 +823,39 @@ function ContentRenderer({ onSelectPage, page, preTestIndex, settings, settingsL
 }
 
 function HomePage({ onStartPreTest, settings }) {
+  const { t } = useAppLocale();
   const contentUnlocked = settings.contentUnlocked;
   const studentSteps = [
     {
       icon: BookOpen,
-      title: 'อ่านคำแนะนำสั้น ๆ',
-      desc: 'หน้านี้บอกภาพรวมว่าต้องเริ่มอย่างไร ไม่ต้องตั้งค่าอะไรเพิ่มเติม'
+      title: t('student.home.step1.title'),
+      desc: t('student.home.step1.desc'),
     },
     {
       icon: ClipboardCheck,
-      title: 'ทำแบบทดสอบก่อนเรียน',
+      title: t('student.home.step2.title'),
       desc: settings.preTestRequired
-        ? 'ตอบคำถาม 10 ข้อตามความรู้เดิม ไม่ต้องกังวลหากยังตอบไม่ได้'
-        : 'อาจารย์ไม่บังคับ Pre-Test แต่แนะนำให้ทำเพื่อวัดความรู้เดิม'
+        ? t('student.home.step2.descRequired')
+        : t('student.home.step2.descOptional'),
     },
     {
       icon: Unlock,
-      title: 'รออาจารย์เปิดบทเรียน',
-      desc: 'เมื่ออาจารย์เปิดแล้ว จึงเรียนเนื้อหาและทำแบบทดสอบหลังเรียนได้'
-    }
+      title: t('student.home.step3.title'),
+      desc: t('student.home.step3.desc'),
+    },
   ];
 
   const faqItems = [
+    { q: t('student.faq.q1'), a: t('student.faq.a1') },
+    { q: t('student.faq.q2'), a: t('student.faq.a2') },
     {
-      q: 'ถ้าบทเรียนยังล็อกอยู่ต้องทำอย่างไร?',
-      a: 'แจ้งอาจารย์ผู้สอนให้เปิดบทเรียนจากหน้าครู จากนั้นรอสักครู่ระบบจะอัปเดตสถานะให้อัตโนมัติ'
+      q: t('student.faq.q3'),
+      a: settings.preTestRequired ? t('student.faq.a3Required') : t('student.faq.a3Optional'),
     },
     {
-      q: 'ถ้าใช้มือถือหรือแท็บเล็ตได้ไหม?',
-      a: 'ใช้งานได้ หน้าจอจะปรับเป็นการ์ดเรียงแนวตั้งและปุ่มขนาดใหญ่'
+      q: t('student.faq.q4'),
+      a: settings.postTestUnlocked ? t('student.faq.a4Open') : t('student.faq.a4Closed'),
     },
-    {
-      q: 'ต้องให้ทำ Pre-Test ก่อนเสมอไหม?',
-      a: settings.preTestRequired
-        ? 'ใช่ อาจารย์กำหนดให้ทำ Pre-Test ก่อนเรียน'
-        : 'ไม่บังคับ แต่แนะนำให้ทำเพื่อวัดระดับความรู้เดิม'
-    },
-    {
-      q: 'Post-Test เปิดเมื่อไหร่?',
-      a: settings.postTestUnlocked
-        ? 'Post-Test เปิดแล้ว เรียนจบเนื้อหาแล้วทำได้เลย'
-        : 'รออาจารย์เปิด Post-Test หลังเรียนเนื้อหาเสร็จ'
-    }
   ];
 
   return (
@@ -862,13 +863,13 @@ function HomePage({ onStartPreTest, settings }) {
       <div className="overflow-hidden rounded-[2rem] bg-gradient-to-br from-slate-950 via-slate-900 to-orange-950 p-6 text-white shadow-2xl sm:p-10 lg:p-12">
         <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
           <div>
-            <PageEyebrow label="Home Guide" light />
+            <PageEyebrow label={t('student.home.eyebrow')} light />
             <h2 className="mt-5 text-3xl font-extrabold leading-tight sm:text-5xl lg:text-6xl">
               {settings.courseTitle}
             </h2>
             <p className="mt-3 text-lg text-orange-100">{settings.classroomName}</p>
             <p className="mt-5 max-w-3xl text-lg leading-9 text-orange-50">
-              เริ่มจากแบบทดสอบก่อนเรียน จากนั้นรออาจารย์เปิดบทเรียน เพื่อให้ทุกคนเรียนไปพร้อมกันอย่างเป็นลำดับ
+              {t('student.home.heroDesc')}
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <button
@@ -877,8 +878,16 @@ function HomePage({ onStartPreTest, settings }) {
                 className="inline-flex items-center justify-center gap-2 rounded-2xl bg-orange-500 px-6 py-4 font-bold text-white shadow-lg shadow-orange-950/30 transition hover:bg-orange-600"
               >
                 <PlayCircle size={22} />
-                เริ่มทำ Pre-Test
+                {t('student.home.startPretest')}
               </button>
+              <Link
+                to="/manual/student"
+                className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/30 bg-white/10 px-6 py-4 font-bold text-white transition hover:bg-white/20"
+                title={t('student.home.manualTitle')}
+              >
+                <HelpCircle size={22} />
+                {t('student.home.manual')}
+              </Link>
             </div>
           </div>
 
@@ -886,11 +895,11 @@ function HomePage({ onStartPreTest, settings }) {
             <div className={`mb-5 inline-flex rounded-2xl p-4 ${contentUnlocked ? 'bg-emerald-400/20 text-emerald-200' : 'bg-white/10 text-orange-200'}`}>
               {contentUnlocked ? <Unlock size={34} /> : <Lock size={34} />}
             </div>
-            <h3 className="text-2xl font-extrabold">{contentUnlocked ? 'บทเรียนเปิดแล้ว' : 'บทเรียนยังล็อกอยู่'}</h3>
+            <h3 className="text-2xl font-extrabold">{contentUnlocked ? t('student.home.unlockedTitle') : t('student.home.lockedTitle')}</h3>
             <p className="mt-3 leading-8 text-slate-200">
               {contentUnlocked
-                ? 'สามารถเข้าเรียนเนื้อหาได้แล้ว' + (settings.postTestUnlocked ? ' และทำ Post-Test ได้' : ' (Post-Test ยังปิดอยู่)')
-                : 'จะเห็น Home และ Pre-Test ก่อน จนกว่าอาจารย์จะเปิดบทเรียน'}
+                ? settings.postTestUnlocked ? t('student.home.unlockedWithPost') : t('student.home.unlockedNoPost')
+                : t('student.home.lockedDesc')}
             </p>
           </div>
         </div>
@@ -898,7 +907,7 @@ function HomePage({ onStartPreTest, settings }) {
 
       {!isAnnouncementEmpty(settings.announcement) ? (
         <div className="rounded-3xl border border-orange-200 bg-orange-50 p-6 text-orange-950 shadow-sm">
-          <p className="text-sm font-bold uppercase tracking-[0.18em] text-orange-600">ประกาศจากอาจารย์</p>
+          <p className="text-sm font-bold uppercase tracking-[0.18em] text-orange-600">{t('student.home.announcement')}</p>
           <AnnouncementContent
             content={settings.announcement}
             htmlEnabled={settings.announcementHtmlEnabled === true}
@@ -915,7 +924,7 @@ function HomePage({ onStartPreTest, settings }) {
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-100 text-orange-600">
                   <Icon size={24} />
                 </div>
-                <span className="rounded-full bg-slate-100 px-3 py-1 text-sm font-bold text-slate-500">Step {index + 1}</span>
+                <span className="rounded-full bg-slate-100 px-3 py-1 text-sm font-bold text-slate-500">{t('student.home.stepLabel', { n: index + 1 })}</span>
               </div>
               <h3 className="text-xl font-extrabold text-slate-950">{step.title}</h3>
               <p className="mt-3 leading-8 text-slate-600">{step.desc}</p>
@@ -925,9 +934,9 @@ function HomePage({ onStartPreTest, settings }) {
       </div>
 
       <div className="rounded-3xl border border-orange-100 bg-orange-50 p-5 text-orange-900">
-        <p className="font-bold">หมายเหตุสำหรับนักศึกษา</p>
+        <p className="font-bold">{t('student.home.note.title')}</p>
         <p className="mt-2 leading-8">
-          ระบบนี้ใช้เพื่อวัดความเข้าใจก่อนและหลังเรียน คะแนนใช้ประกอบการเรียนการสอน โปรดตอบ Pre-Test ตามความรู้เดิมของตนเอง
+          {t('student.home.note.body')}
         </p>
       </div>
 
@@ -937,8 +946,8 @@ function HomePage({ onStartPreTest, settings }) {
             <HelpCircle size={26} />
           </div>
           <div>
-            <p className="text-sm font-bold uppercase tracking-[0.18em] text-orange-500">FAQ</p>
-            <h3 className="text-2xl font-extrabold text-slate-950">คำถามที่พบบ่อย</h3>
+            <p className="text-sm font-bold uppercase tracking-[0.18em] text-orange-500">{t('student.faq.eyebrow')}</p>
+            <h3 className="text-2xl font-extrabold text-slate-950">{t('student.faq.title')}</h3>
           </div>
         </div>
         <div className="space-y-3">
@@ -949,29 +958,38 @@ function HomePage({ onStartPreTest, settings }) {
             </article>
           ))}
         </div>
+        <Link
+          to="/manual/student/announcements-faq"
+          className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-orange-500 px-5 py-3 text-sm font-bold text-white transition hover:bg-orange-600"
+        >
+          <HelpCircle size={18} />
+          {t('student.faq.openManual')}
+        </Link>
       </section>
     </section>
   );
 }
 
 function LockedContentGate({ onGoHome, settings }) {
+  const { t } = useAppLocale();
+
   return (
-    <section className="mx-auto max-w-3xl rounded-[2rem] bg-white p-8 text-center shadow-2xl shadow-slate-200/80">
-      <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-3xl bg-slate-100 text-slate-500">
+    <section className="mx-auto max-w-3xl rounded-[2rem] bg-white p-8 text-center shadow-2xl shadow-slate-200/80 dark:bg-slate-900 dark:shadow-none">
+      <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-3xl bg-slate-100 text-slate-500 dark:bg-slate-800">
         <Lock size={40} />
       </div>
-      <h2 className="text-3xl font-extrabold text-slate-950">บทเรียนส่วนนี้ยังล็อกอยู่</h2>
-      <p className="mt-4 leading-8 text-slate-600">
+      <h2 className="text-3xl font-extrabold text-slate-950 dark:text-white">{t('student.locked.title')}</h2>
+      <p className="mt-4 leading-8 text-slate-600 dark:text-slate-400">
         {settings?.preTestRequired !== false
-          ? 'กรุณาทำแบบทดสอบก่อนเรียน และรออาจารย์ผู้สอนเปิดบทเรียน'
-          : 'รออาจารย์ผู้สอนเปิดบทเรียน เมื่อนั้นระบบจะแสดงเนื้อหาถัดไปให้เรียนต่อ'}
+          ? t('student.locked.bodyRequired')
+          : t('student.locked.bodyOptional')}
       </p>
       <button
         type="button"
         onClick={onGoHome}
         className="mt-7 rounded-2xl bg-orange-500 px-6 py-3 font-bold text-white shadow-lg shadow-orange-500/25 transition hover:bg-orange-600"
       >
-        กลับหน้า Home
+        {t('student.locked.backHome')}
       </button>
     </section>
   );

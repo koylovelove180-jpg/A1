@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap');
+@import './styles/tokens.css';
 
 @tailwind base;
 @tailwind components;
@@ -90,4 +91,37 @@ body::-webkit-scrollbar-thumb,
 
 .announcement-html p {
   margin: 0.5rem 0;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+html.dark body {
+  background: #0f172a;
+}
+
+@media print {
+  header,
+  aside,
+  .no-print,
+  button:not(.print-visible) {
+    display: none !important;
+  }
+
+  .manual-print-area {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+
+  body {
+    background: white !important;
+    color: #0f172a !important;
+  }
+
+  .manual-print-area a[href]::after {
+    content: ' (' attr(href) ')';
+    font-size: 0.75rem;
+    color: #64748b;
+  }
 }

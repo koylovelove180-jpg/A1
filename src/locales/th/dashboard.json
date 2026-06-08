@@ -1,0 +1,21 @@
+{
+  "dashboard.hero.eyebrow": "E-Learning Portal",
+  "dashboard.hero.title": "ยินดีต้อนรับสู่ระบบ E-Learning",
+  "dashboard.hero.subtitle": "เลือกบทบาทของคุณเพื่อเริ่มใช้งาน — การประกอบอาหารเบื้องต้น",
+  "dashboard.roles.student": "นักเรียน",
+  "dashboard.roles.studentDesc": "ทำ Pre-Test เรียนบทเรียน และ Post-Test",
+  "dashboard.roles.teacher": "อาจารย์",
+  "dashboard.roles.teacherDesc": "ควบคุมห้องเรียน ตั้งค่า และประกาศ",
+  "dashboard.roles.manual": "คู่มือการใช้งาน",
+  "dashboard.roles.manualDesc": "ค้นหาคำตอบและดูขั้นตอนละเอียด",
+  "dashboard.stats.classroom": "สถานะห้องเรียน",
+  "dashboard.stats.lessons": "บทเรียน",
+  "dashboard.stats.pretest": "Pre-Test",
+  "dashboard.stats.posttest": "Post-Test",
+  "dashboard.stats.unlocked": "เปิดแล้ว",
+  "dashboard.stats.locked": "ปิดอยู่",
+  "dashboard.stats.required": "บังคับ",
+  "dashboard.stats.optional": "ไม่บังคับ",
+  "dashboard.footer.help": "ต้องการความช่วยเหลือ?",
+  "dashboard.footer.manualLink": "เปิดคู่มือฉบับเต็ม"
+}

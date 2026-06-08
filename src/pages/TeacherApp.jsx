@@ -14,6 +14,9 @@ import {
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import LocaleThemeControls from '../components/dashboard/LocaleThemeControls';
+import DashboardLayout from '../layouts/DashboardLayout';
+import { useAppLocale } from '../i18n/AppLocaleProvider';
 import { TEACHER_EMAIL, TEACHER_USERNAME, isFirebaseConfigured } from '../config';
 import AnnouncementContent from '../components/AnnouncementContent';
 import AnnouncementQrTool from '../components/AnnouncementQrTool';
@@ -22,21 +25,23 @@ import { PRETEST_MUSIC_OPTIONS, resolvePretestMusicUrl } from '../data/pretestMu
 import { auth } from '../firebase';
 import { useLessonControls } from '../hooks/useLessonControls';
 
-const teacherSteps = [
-  'ส่งลิงก์ /student หรือ / ให้นักศึกษาเข้าเรียน',
-  'ให้นักศึกษากดปุ่มเริ่มทำ Pre-Test และตอบให้ครบ 10 ข้อ',
-  'รอให้นักศึกษาทำแบบทดสอบก่อนเรียนเสร็จ',
-  'ตรวจสถานะห้องเรียนในแผงควบคุมด้านล่าง',
-  'กดเปิดบทเรียน เมื่อต้องการให้นักศึกษาเห็นเนื้อหา',
-  'เปิด Post-Test เมื่อพร้อมให้ทำแบบทดสอบหลังเรียน',
+const TEACHER_GUIDE_STEP_KEYS = [
+  'teacher.guide.step1',
+  'teacher.guide.step2',
+  'teacher.guide.step3',
+  'teacher.guide.step4',
+  'teacher.guide.step5',
+  'teacher.guide.step6',
 ];
 
 function ToggleRow({ label, description, enabled, onToggle }) {
+  const { t } = useAppLocale();
+
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-slate-100 bg-slate-50 p-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-3 rounded-2xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/60 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <p className="font-bold text-slate-950">{label}</p>
-        <p className="mt-1 text-sm leading-7 text-slate-600">{description}</p>
+        <p className="font-bold text-slate-950 dark:text-white">{label}</p>
+        <p className="mt-1 text-sm leading-7 text-slate-600 dark:text-slate-400">{description}</p>
       </div>
       <button
         type="button"
@@ -46,13 +51,14 @@ function ToggleRow({ label, description, enabled, onToggle }) {
         }`}
       >
         {enabled ? <Unlock size={18} /> : <Lock size={18} />}
-        {enabled ? 'เปิดอยู่' : 'ปิดอยู่'}
+        {enabled ? t('app.toggle.open') : t('app.toggle.closed')}
       </button>
     </div>
   );
 }
 
 function TeacherLogin({ onLoginSuccess, error, loading }) {
+  const { t } = useAppLocale();
   const [username, setUsername] = useState(TEACHER_USERNAME);
   const [password, setPassword] = useState('');
 
@@ -62,26 +68,29 @@ function TeacherLogin({ onLoginSuccess, error, loading }) {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-10">
+    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-10 dark:bg-slate-950">
       <div className="w-full max-w-2xl space-y-6">
-        <div className="rounded-[2rem] bg-white p-8 shadow-2xl shadow-slate-200/80">
+        <div className="flex justify-end">
+          <LocaleThemeControls />
+        </div>
+        <div className="rounded-[2rem] bg-white p-8 shadow-2xl shadow-slate-200/80 dark:bg-slate-900 dark:shadow-none">
           <div className="mb-6 inline-flex rounded-2xl bg-orange-100 p-4 text-orange-600">
             <UserCog size={32} />
           </div>
-          <h1 className="text-3xl font-extrabold text-slate-950">เข้าสู่ระบบอาจารย์</h1>
-          <p className="mt-3 leading-8 text-slate-600">
-            ใช้ username <span className="font-bold">{TEACHER_USERNAME}</span> และรหัสผ่านที่ตั้งใน Firebase Auth
+          <h1 className="text-3xl font-extrabold text-slate-950 dark:text-white">{t('teacher.login.title')}</h1>
+          <p className="mt-3 leading-8 text-slate-600 dark:text-slate-400">
+            {t('teacher.login.desc', { username: TEACHER_USERNAME })}
           </p>
 
           {!isFirebaseConfigured() && (
-            <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-7 text-amber-900">
-              ยังไม่ได้ตั้งค่า Firebase — ระบบใช้โหมดทดสอบในเครื่อง (localStorage) สำหรับบันทึกการตั้งค่า
+            <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-7 text-amber-900 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-100">
+              {t('teacher.login.firebaseWarning')}
             </div>
           )}
 
           <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
             <label className="block">
-              <span className="text-sm font-semibold text-slate-700">Username</span>
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">{t('teacher.login.username')}</span>
               <input
                 type="text"
                 value={username}
@@ -91,7 +100,7 @@ function TeacherLogin({ onLoginSuccess, error, loading }) {
               />
             </label>
             <label className="block">
-              <span className="text-sm font-semibold text-slate-700">Password</span>
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">{t('teacher.login.password')}</span>
               <input
                 type="password"
                 value={password}
@@ -110,7 +119,7 @@ function TeacherLogin({ onLoginSuccess, error, loading }) {
               disabled={loading}
               className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-orange-500 px-5 py-3 font-bold text-white shadow-lg transition hover:bg-orange-600 disabled:opacity-60"
             >
-              {loading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ'}
+              {loading ? t('teacher.login.submitting') : t('teacher.login.submit')}
             </button>
           </form>
 
@@ -119,17 +128,25 @@ function TeacherLogin({ onLoginSuccess, error, loading }) {
             className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-orange-600 hover:text-orange-700"
           >
             <ExternalLink size={16} />
-            ไปหน้านักศึกษา
+            {t('teacher.login.goStudent')}
           </Link>
         </div>
 
         <TeacherHelpVideo compact />
+        <Link
+          to="/manual/teacher"
+          className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-orange-600 hover:text-orange-700"
+        >
+          <BookOpen size={16} />
+          {t('teacher.login.fullManual')}
+        </Link>
       </div>
     </div>
   );
 }
 
 function MusicPreviewButton({ filePath, volume }) {
+  const { t } = useAppLocale();
   const audioRef = useRef(null);
 
   const handlePreview = async () => {
@@ -153,13 +170,14 @@ function MusicPreviewButton({ filePath, volume }) {
         className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 transition hover:border-orange-200 hover:text-orange-600"
       >
         <PlayCircle size={18} />
-        ฟังตัวอย่าง
+        {t('teacher.music.preview')}
       </button>
     </>
   );
 }
 
 function TeacherDashboard({ user, onLogout }) {
+  const { t } = useAppLocale();
   const { settings, loading, error, isRemote, saveSettings, resetSettings } = useLessonControls();
   const [draft, setDraft] = useState(settings);
   const [saveMessage, setSaveMessage] = useState('');
@@ -176,9 +194,9 @@ function TeacherDashboard({ user, onLogout }) {
     setSaveError('');
     try {
       await saveSettings(draft, user?.email || TEACHER_USERNAME);
-      setSaveMessage('บันทึกการตั้งค่าเรียบร้อยแล้ว');
+      setSaveMessage(t('teacher.save.success'));
     } catch (saveErr) {
-      setSaveError(saveErr.message || 'บันทึกไม่สำเร็จ');
+      setSaveError(saveErr.message || t('teacher.save.error'));
     } finally {
       setSaving(false);
     }
@@ -190,9 +208,9 @@ function TeacherDashboard({ user, onLogout }) {
     setSaveError('');
     try {
       await resetSettings(user?.email || TEACHER_USERNAME);
-      setSaveMessage('รีเซ็ตห้องเรียนเป็นค่าเริ่มต้นแล้ว');
+      setSaveMessage(t('teacher.reset.success'));
     } catch (resetErr) {
-      setSaveError(resetErr.message || 'รีเซ็ตไม่สำเร็จ');
+      setSaveError(resetErr.message || t('teacher.reset.error'));
     } finally {
       setSaving(false);
     }
@@ -202,95 +220,96 @@ function TeacherDashboard({ user, onLogout }) {
     setDraft((current) => ({ ...current, [field]: !current[field] }));
   };
 
+  const topBarActions = (
+    <>
+      <Link
+        to="/student"
+        className="hidden items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 transition hover:border-orange-200 hover:text-orange-600 sm:inline-flex dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+      >
+        <ExternalLink size={16} />
+        {t('teacher.dashboard.viewStudent')}
+      </Link>
+      <button
+        type="button"
+        onClick={onLogout}
+        className="inline-flex items-center gap-2 rounded-2xl bg-slate-800 px-3 py-2 text-xs font-bold text-white transition hover:bg-slate-900"
+      >
+        <LogOut size={16} />
+        {t('teacher.dashboard.logout')}
+      </button>
+    </>
+  );
+
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-8 sm:px-6 lg:px-10">
+    <DashboardLayout variant="teacher" topBarActions={topBarActions}>
       <div className="mx-auto max-w-5xl space-y-6">
-        <header className="flex flex-col gap-4 rounded-[2rem] bg-white p-6 shadow-xl sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm font-bold uppercase tracking-[0.18em] text-orange-500">Teacher Dashboard</p>
-            <h1 className="mt-2 text-3xl font-extrabold text-slate-950">แผงควบคุมห้องเรียน</h1>
-            <p className="mt-2 text-slate-600">
-              {user?.email || 'โหมดทดสอบในเครื่อง'} · {isRemote ? 'เชื่อมต่อ Firestore แล้ว' : 'ใช้ localStorage'}
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            <Link
-              to="/student"
-              className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-700 transition hover:border-orange-200 hover:text-orange-600"
-            >
-              <ExternalLink size={18} />
-              ดูมุมนักศึกษา
-            </Link>
-            <button
-              type="button"
-              onClick={onLogout}
-              className="inline-flex items-center gap-2 rounded-2xl bg-slate-800 px-4 py-3 text-sm font-bold text-white transition hover:bg-slate-900"
-            >
-              <LogOut size={18} />
-              ออกจากระบบ
-            </button>
-          </div>
-        </header>
+        <div className="rounded-[2rem] bg-white p-6 shadow-xl dark:bg-slate-900">
+          <p className="text-sm font-bold uppercase tracking-[0.18em] text-orange-500">{t('teacher.dashboard.eyebrow')}</p>
+          <p className="mt-2 text-slate-600 dark:text-slate-400">
+            {user?.email || t('teacher.dashboard.modeLocal')} ·{' '}
+            {isRemote ? t('teacher.dashboard.modeFirestore') : t('teacher.dashboard.modeLocalStorage')}
+          </p>
+        </div>
 
         {(error || saveError) && (
-          <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">
+          <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700 dark:border-red-900 dark:bg-red-950/40 dark:text-red-200">
             {saveError || error}
           </div>
         )}
 
         {saveMessage ? (
-          <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-700">
+          <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-200">
             {saveMessage}
           </div>
         ) : null}
 
         <section className="grid gap-6 lg:grid-cols-2">
-          <div className="rounded-[2rem] bg-white p-6 shadow-xl">
-            <h2 className="text-xl font-extrabold text-slate-950">สถานะห้องเรียน</h2>
-            <p className="mt-2 text-sm text-slate-600">กดสลับสถานะแล้วกดบันทึก — นักศึกษาจะเห็นการเปลี่ยนแปลงทันที</p>
+          <div className="rounded-[2rem] bg-white p-6 shadow-xl dark:bg-slate-900">
+            <h2 className="text-xl font-extrabold text-slate-950 dark:text-white">{t('teacher.status.title')}</h2>
+            <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">{t('teacher.status.desc')}</p>
             <div className="mt-5 space-y-3">
               <ToggleRow
-                label="เปิดบทเรียน"
-                description="นักศึกษาเห็นเนื้อหาหลัก (หน้า 3–11)"
+                label={t('teacher.toggle.unlockLessons')}
+                description={t('teacher.toggle.unlockLessonsDesc')}
                 enabled={draft.contentUnlocked}
                 onToggle={() => toggleField('contentUnlocked')}
               />
               <ToggleRow
-                label="เปิด Post-Test"
-                description="อนุญาตให้ทำแบบทดสอบหลังเรียน"
+                label={t('teacher.toggle.postTest')}
+                description={t('teacher.toggle.postTestDesc')}
                 enabled={draft.postTestUnlocked}
                 onToggle={() => toggleField('postTestUnlocked')}
               />
             </div>
           </div>
 
-          <div className="rounded-[2rem] bg-white p-6 shadow-xl">
+          <div className="rounded-[2rem] bg-white p-6 shadow-xl dark:bg-slate-900">
             <div className="mb-5 flex items-center gap-3">
               <div className="rounded-2xl bg-orange-100 p-3 text-orange-600">
                 <Music size={22} />
               </div>
               <div>
-                <h2 className="text-xl font-extrabold text-slate-950">แบบทดสอบก่อนเรียน</h2>
-                <p className="mt-1 text-sm text-slate-600">ตั้งค่า Pre-Test และเพลงก่อนเริ่มทำข้อสอบเท่านั้น</p>
+                <h2 className="text-xl font-extrabold text-slate-950 dark:text-white">{t('teacher.pretest.title')}</h2>
+                <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">{t('teacher.pretest.desc')}</p>
               </div>
             </div>
             <div className="space-y-3">
               <ToggleRow
-                label="บังคับทำ Pre-Test"
-                description="แนะนำให้เปิดไว้เพื่อวัดความรู้ก่อนเรียน"
+                label={t('teacher.toggle.requirePretest')}
+                description={t('teacher.toggle.requirePretestDesc')}
                 enabled={draft.preTestRequired}
                 onToggle={() => toggleField('preTestRequired')}
               />
               <ToggleRow
-                label="เปิดเพลงก่อนเริ่ม Pre-test"
-                description="นักเรียนจะเห็นหน้าฟังเพลงก่อนเข้าข้อสอบ Pre-Test"
+                label={t('teacher.toggle.musicIntro')}
+                description={t('teacher.toggle.musicIntroDesc')}
                 enabled={draft.pretestMusicEnabled}
                 onToggle={() => toggleField('pretestMusicEnabled')}
               />
               {draft.pretestMusicEnabled && (
                 <div className="space-y-4 rounded-2xl border border-orange-100 bg-orange-50/50 p-4">
                   <label className="block">
-                    <span className="text-sm font-semibold text-slate-700">เลือกเพลงสำหรับแบบทดสอบก่อนเรียน</span>
+                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">{t('teacher.music.select')}</span>
                     <select
                       value={draft.pretestMusicFile}
                       onChange={(event) =>
@@ -306,32 +325,32 @@ function TeacherDashboard({ user, onLogout }) {
                     </select>
                   </label>
                   <label className="block">
-                    <span className="text-sm font-semibold text-slate-700">ชื่อเพลงแสดงบนหน้ intro (ไม่บังคับ)</span>
+                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">{t('teacher.music.titleLabel')}</span>
                     <input
                       type="text"
                       value={draft.pretestMusicTitle}
                       onChange={(event) =>
                         setDraft((current) => ({ ...current, pretestMusicTitle: event.target.value }))
                       }
-                      placeholder="เช่น เพลงก่อนเริ่มแบบทดสอบก่อนเรียน"
+                      placeholder={t('teacher.music.titlePlaceholder')}
                       className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none ring-orange-200 focus:ring-2"
                     />
                   </label>
                   <ToggleRow
-                    label="ต้องฟังจบก่อนเริ่ม"
-                    description="ปุ่มเริ่มทำแบบทดสอบก่อนเรียนจะเปิดเมื่อเพลงเล่นจบ"
+                    label={t('teacher.toggle.requireFinish')}
+                    description={t('teacher.toggle.requireFinishDesc')}
                     enabled={draft.pretestMusicRequireFinish}
                     onToggle={() => toggleField('pretestMusicRequireFinish')}
                   />
                   <ToggleRow
-                    label="อนุญาตข้ามเพลง"
-                    description="แสดงปุ่มข้ามเพลงแม้ยังฟังไม่จบ"
+                    label={t('teacher.toggle.allowSkip')}
+                    description={t('teacher.toggle.allowSkipDesc')}
                     enabled={draft.pretestMusicSkippable}
                     onToggle={() => toggleField('pretestMusicSkippable')}
                   />
                   <label className="block">
-                    <span className="text-sm font-semibold text-slate-700">
-                      ระดับเสียง ({Math.round((draft.pretestMusicVolume ?? 0.7) * 100)}%)
+                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                      {t('teacher.music.volume', { percent: Math.round((draft.pretestMusicVolume ?? 0.7) * 100) })}
                     </span>
                     <input
                       type="range"
@@ -356,11 +375,11 @@ function TeacherDashboard({ user, onLogout }) {
         </section>
 
         <section className="grid gap-6 lg:grid-cols-1">
-          <div className="rounded-[2rem] bg-white p-6 shadow-xl lg:col-span-1">
-            <h2 className="text-xl font-extrabold text-slate-950">ข้อมูลห้องเรียน</h2>
+          <div className="rounded-[2rem] bg-white p-6 shadow-xl dark:bg-slate-900 lg:col-span-1">
+            <h2 className="text-xl font-extrabold text-slate-950 dark:text-white">{t('teacher.classroom.title')}</h2>
             <div className="mt-5 space-y-4">
               <label className="block">
-                <span className="text-sm font-semibold text-slate-700">ชื่อรายวิชา</span>
+                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">{t('teacher.classroom.courseTitle')}</span>
                 <input
                   type="text"
                   value={draft.courseTitle}
@@ -369,7 +388,7 @@ function TeacherDashboard({ user, onLogout }) {
                 />
               </label>
               <label className="block">
-                <span className="text-sm font-semibold text-slate-700">ชื่อห้อง / กลุ่มเรียน</span>
+                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">{t('teacher.classroom.classroomName')}</span>
                 <input
                   type="text"
                   value={draft.classroomName}
@@ -378,10 +397,10 @@ function TeacherDashboard({ user, onLogout }) {
                 />
               </label>
               <label className="block">
-                <span className="text-sm font-semibold text-slate-700">ประกาศถึงนักศึกษา</span>
+                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">{t('teacher.classroom.announcement')}</span>
                 <ToggleRow
-                  label="ใช้ HTML ในประกาศ"
-                  description="รองรับ HTML เช่น ลิงก์ รูปภาพ และ QR Code สำหรับให้นักเรียนสแกน"
+                  label={t('teacher.classroom.htmlToggle')}
+                  description={t('teacher.classroom.htmlToggleDesc')}
                   enabled={draft.announcementHtmlEnabled}
                   onToggle={() => toggleField('announcementHtmlEnabled')}
                 />
@@ -398,7 +417,7 @@ function TeacherDashboard({ user, onLogout }) {
                 />
                 {draft.announcementHtmlEnabled && draft.announcement ? (
                   <div className="mt-4 rounded-2xl border border-orange-100 bg-orange-50 p-4">
-                    <p className="text-sm font-bold uppercase tracking-[0.18em] text-orange-600">ตัวอย่างที่นักเรียนจะเห็น</p>
+                    <p className="text-sm font-bold uppercase tracking-[0.18em] text-orange-600">{t('teacher.classroom.preview')}</p>
                     <AnnouncementContent
                       content={draft.announcement}
                       htmlEnabled={draft.announcementHtmlEnabled}
@@ -437,51 +456,58 @@ function TeacherDashboard({ user, onLogout }) {
             className="inline-flex items-center gap-2 rounded-2xl bg-orange-500 px-5 py-3 font-bold text-white shadow-lg transition hover:bg-orange-600 disabled:opacity-60"
           >
             <Save size={18} />
-            {saving ? 'กำลังบันทึก...' : 'บันทึกการตั้งค่า'}
+            {saving ? t('teacher.save.saving') : t('teacher.save.btn')}
           </button>
           <button
             type="button"
             onClick={handleReset}
             disabled={saving || loading}
-            className="inline-flex items-center gap-2 rounded-2xl bg-slate-200 px-5 py-3 font-bold text-slate-800 transition hover:bg-slate-300 disabled:opacity-60"
+            className="inline-flex items-center gap-2 rounded-2xl bg-slate-200 px-5 py-3 font-bold text-slate-800 transition hover:bg-slate-300 disabled:opacity-60 dark:bg-slate-700 dark:text-slate-100"
           >
             <RotateCcw size={18} />
-            รีเซ็ตห้องเรียน
+            {t('teacher.reset.btn')}
           </button>
         </div>
 
-        <section className="rounded-[2rem] bg-white p-6 shadow-xl sm:p-8">
+        <section className="rounded-[2rem] bg-white p-6 shadow-xl dark:bg-slate-900 sm:p-8">
           <TeacherHelpVideo />
+          <Link
+            to="/manual/teacher"
+            className="mt-4 inline-flex items-center gap-2 rounded-2xl bg-orange-500 px-5 py-3 text-sm font-bold text-white transition hover:bg-orange-600"
+          >
+            <BookOpen size={18} />
+            {t('teacher.guide.fullManual')}
+          </Link>
 
           <div className="mb-6 mt-8 flex items-center gap-3">
             <div className="rounded-2xl bg-orange-100 p-3 text-orange-600">
               <BookOpen size={24} />
             </div>
             <div>
-              <p className="text-sm font-bold uppercase tracking-[0.18em] text-orange-500">Teacher Guide</p>
-              <h2 className="text-2xl font-extrabold text-slate-950">คู่มืออาจารย์ทีละขั้นตอน</h2>
+              <p className="text-sm font-bold uppercase tracking-[0.18em] text-orange-500">{t('teacher.guide.eyebrow')}</p>
+              <h2 className="text-2xl font-extrabold text-slate-950 dark:text-white">{t('teacher.guide.title')}</h2>
             </div>
           </div>
           <ol className="space-y-3">
-            {teacherSteps.map((step, index) => (
-              <li key={step} className="flex gap-3 rounded-2xl border border-slate-100 bg-slate-50 p-4">
+            {TEACHER_GUIDE_STEP_KEYS.map((stepKey, index) => (
+              <li key={stepKey} className="flex gap-3 rounded-2xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/60">
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-orange-100 text-sm font-extrabold text-orange-600">
                   {index + 1}
                 </span>
-                <span className="leading-7 text-slate-700">{step}</span>
+                <span className="leading-7 text-slate-700 dark:text-slate-300">{t(stepKey)}</span>
               </li>
             ))}
           </ol>
-          <div className="mt-6 rounded-2xl border border-orange-100 bg-orange-50 p-4 text-sm leading-7 text-orange-900">
-            <p className="font-bold">เคล็ดลับ</p>
+          <div className="mt-6 rounded-2xl border border-orange-100 bg-orange-50 p-4 text-sm leading-7 text-orange-900 dark:border-orange-900 dark:bg-orange-950/40 dark:text-orange-100">
+            <p className="font-bold">{t('teacher.guide.tip')}</p>
             <p className="mt-1 flex items-start gap-2">
               <ClipboardCheck size={18} className="mt-0.5 shrink-0" />
-              เปิดแท็บ /student คู่กับ /teacher เพื่อดูผลลัพธ์แบบ realtime ขณะสอน
+              {t('teacher.guide.tipBody')}
             </p>
           </div>
         </section>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }
 
